@@ -23,14 +23,14 @@ import org.compiere.model.*;
 
 /** Generated Model for ING_ModelGenerator
  *  @author iDempiere (generated) 
- *  @version Release 5.1 - $Id$ */
+ *  @version Release 8.2 - $Id$ */
 public class X_ING_ModelGenerator extends PO implements I_ING_ModelGenerator, I_Persistent 
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20180703L;
+	private static final long serialVersionUID = 20210110L;
 
     /** Standard Constructor */
     public X_ING_ModelGenerator (Properties ctx, int ING_ModelGenerator_ID, String trxName)
@@ -65,29 +65,29 @@ public class X_ING_ModelGenerator extends PO implements I_ING_ModelGenerator, I_
 
     public String toString()
     {
-      StringBuffer sb = new StringBuffer ("X_ING_ModelGenerator[")
+      StringBuilder sb = new StringBuilder ("X_ING_ModelGenerator[")
         .append(get_ID()).append("]");
       return sb.toString();
     }
 
-	/** EntityType AD_Reference_ID=389 */
-	public static final int ENTITYTYPE_AD_Reference_ID=389;
-	/** Set Entity Type.
-		@param EntityType 
-		Dictionary Entity Type; Determines ownership and synchronization
+	/** EntityTypeFilter AD_Reference_ID=389 */
+	public static final int ENTITYTYPEFILTER_AD_Reference_ID=389;
+	/** Set Entity Type Filter .
+		@param EntityTypeFilter 
+		A list of Entity Types.
 	  */
-	public void setEntityType (String EntityType)
+	public void setEntityTypeFilter (String EntityTypeFilter)
 	{
 
-		set_Value (COLUMNNAME_EntityType, EntityType);
+		set_Value (COLUMNNAME_EntityTypeFilter, EntityTypeFilter);
 	}
 
-	/** Get Entity Type.
-		@return Dictionary Entity Type; Determines ownership and synchronization
+	/** Get Entity Type Filter .
+		@return A list of Entity Types.
 	  */
-	public String getEntityType () 
+	public String getEntityTypeFilter () 
 	{
-		return (String)get_Value(COLUMNNAME_EntityType);
+		return (String)get_Value(COLUMNNAME_EntityTypeFilter);
 	}
 
 	/** Set Folder.
@@ -183,15 +183,35 @@ public class X_ING_ModelGenerator extends PO implements I_ING_ModelGenerator, I_
 		return ii.intValue();
 	}
 
-	/** Set ModelGeneratorProcess.
-		@param ModelGeneratorProcess ModelGeneratorProcess	  */
+	/** Set Generate Model Class (Stub).
+		@param MModelGeneratorProcess 
+		Generates the Model class (Stub).
+	  */
+	public void setMModelGeneratorProcess (String MModelGeneratorProcess)
+	{
+		set_Value (COLUMNNAME_MModelGeneratorProcess, MModelGeneratorProcess);
+	}
+
+	/** Get Generate Model Class (Stub).
+		@return Generates the Model class (Stub).
+	  */
+	public String getMModelGeneratorProcess () 
+	{
+		return (String)get_Value(COLUMNNAME_MModelGeneratorProcess);
+	}
+
+	/** Set Interface and Model Base Class.
+		@param ModelGeneratorProcess 
+		Generates the interface and model base classes.
+	  */
 	public void setModelGeneratorProcess (String ModelGeneratorProcess)
 	{
 		set_Value (COLUMNNAME_ModelGeneratorProcess, ModelGeneratorProcess);
 	}
 
-	/** Get ModelGeneratorProcess.
-		@return ModelGeneratorProcess	  */
+	/** Get Interface and Model Base Class.
+		@return Generates the interface and model base classes.
+	  */
 	public String getModelGeneratorProcess () 
 	{
 		return (String)get_Value(COLUMNNAME_ModelGeneratorProcess);

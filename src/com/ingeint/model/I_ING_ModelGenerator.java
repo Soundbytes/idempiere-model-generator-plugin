@@ -23,7 +23,7 @@ import org.compiere.util.KeyNamePair;
 
 /** Generated Interface for ING_ModelGenerator
  *  @author iDempiere (generated) 
- *  @version Release 5.1
+ *  @version Release 8.2
  */
 @SuppressWarnings("all")
 public interface I_ING_ModelGenerator 
@@ -32,7 +32,7 @@ public interface I_ING_ModelGenerator
     /** TableName=ING_ModelGenerator */
     public static final String Table_Name = "ING_ModelGenerator";
 
-    /** AD_Table_ID=1000032 */
+    /** AD_Table_ID=1000016 */
     public static final int Table_ID = MTable.getTable_ID(Table_Name);
 
     KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);
@@ -80,20 +80,18 @@ public interface I_ING_ModelGenerator
 	  */
 	public int getCreatedBy();
 
-    /** Column name EntityType */
-    public static final String COLUMNNAME_EntityType = "EntityType";
+    /** Column name EntityTypeFilter */
+    public static final String COLUMNNAME_EntityTypeFilter = "EntityTypeFilter";
 
-	/** Set Entity Type.
-	  * Dictionary Entity Type;
- Determines ownership and synchronization
+	/** Set Entity Type Filter .
+	  * A list of Entity Types.
 	  */
-	public void setEntityType (String EntityType);
+	public void setEntityTypeFilter (String EntityTypeFilter);
 
-	/** Get Entity Type.
-	  * Dictionary Entity Type;
- Determines ownership and synchronization
+	/** Get Entity Type Filter .
+	  * A list of Entity Types.
 	  */
-	public String getEntityType();
+	public String getEntityTypeFilter();
 
     /** Column name Folder */
     public static final String COLUMNNAME_Folder = "Folder";
@@ -163,13 +161,30 @@ public interface I_ING_ModelGenerator
 	  */
 	public boolean isActive();
 
+    /** Column name MModelGeneratorProcess */
+    public static final String COLUMNNAME_MModelGeneratorProcess = "MModelGeneratorProcess";
+
+	/** Set Generate Model Class (Stub).
+	  * Generates the Model class (Stub).
+	  */
+	public void setMModelGeneratorProcess (String MModelGeneratorProcess);
+
+	/** Get Generate Model Class (Stub).
+	  * Generates the Model class (Stub).
+	  */
+	public String getMModelGeneratorProcess();
+
     /** Column name ModelGeneratorProcess */
     public static final String COLUMNNAME_ModelGeneratorProcess = "ModelGeneratorProcess";
 
-	/** Set ModelGeneratorProcess	  */
+	/** Set Interface and Model Base Class.
+	  * Generates the interface and model base classes.
+	  */
 	public void setModelGeneratorProcess (String ModelGeneratorProcess);
 
-	/** Get ModelGeneratorProcess	  */
+	/** Get Interface and Model Base Class.
+	  * Generates the interface and model base classes.
+	  */
 	public String getModelGeneratorProcess();
 
     /** Column name PackageName */
