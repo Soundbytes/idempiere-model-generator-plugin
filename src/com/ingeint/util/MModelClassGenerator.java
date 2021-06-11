@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectStreamClass;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
@@ -22,10 +23,9 @@ import org.adempiere.util.ModelInterfaceGenerator;
 import org.adempiere.webui.apps.AEnv;
 import org.adempiere.webui.component.Messagebox;
 import org.compiere.Adempiere;
-import org.compiere.model.PO;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
-
+import org.compiere.util.Util;
 
 /**
  *  Generate MModel Classes extending the corresponding X_Model Class.
@@ -53,6 +53,11 @@ public class MModelClassGenerator
 			directory += File.separator;
 
 		writeToFile (sb, directory + className + ".java");
+/*		
+		ObjectStreamClass c = ObjectStreamClass.lookup(MyClass.class);
+		long serialID = c.getSerialVersionUID();
+		System.out.println(serialID);
+*/		
 	}
 
 	public static final String NL = "\n";
@@ -106,7 +111,7 @@ public class MModelClassGenerator
 		//
 		StringBuilder baseClassName = new StringBuilder("X_").append(tableName);		
 		StringBuilder keyColumn = new StringBuilder().append(tableName).append("_ID");
-		StringBuilder className = new StringBuilder("M").append(tnStripped);
+		StringBuilder className = new StringBuilder("M").append(Util.replace(tnStripped, "_", ""));
 		//
 
 		sb.append (ModelInterfaceGenerator.COPY)
@@ -124,8 +129,8 @@ public class MModelClassGenerator
 			 .append(" *  @author iDempiere (generated) ").append(NL)
 			 .append(" *  @version ").append(Adempiere.MAIN_VERSION).append(" - $Id$ */").append(NL)
 			 .append("public class ").append(className)
-			 	.append(" extends ").append(baseClassName)
-			 	.append(NL)
+			 .append(" extends ").append(baseClassName)
+			 .append(NL)
 			 .append("{").append(NL)
 
 			 // serialVersionUID
@@ -171,12 +176,13 @@ public class MModelClassGenerator
 	 */
 	private void writeToFile (StringBuilder sb, String fileName)
 	{
+		Reader fr = null;
 		try
 		{
 			File out = new File (fileName);
 			boolean fileExists = true;
 			try {
-				Reader fr = new InputStreamReader(new FileInputStream(out), "UTF-8");
+				fr = new InputStreamReader(new FileInputStream(out), "UTF-8");
 				fr.read();
 			} catch (FileNotFoundException e) {
 				fileExists = false;
@@ -185,6 +191,7 @@ public class MModelClassGenerator
 					String msg = fileName + " already exists! To generate a fresh version of the file please delete it from the file system first.";
 					log.severe(msg); 
 					showMsgBox(msg);
+					fr.close();
 					return;
 				}
 			}
@@ -402,7 +409,5 @@ public class MModelClassGenerator
 			
 		});		
 	}
-	
-	
 }
 

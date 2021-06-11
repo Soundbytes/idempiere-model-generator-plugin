@@ -5,8 +5,6 @@ import java.util.Properties;
 
 import org.compiere.model.MTable;
 
-import com.ingeint.model.X_ING_ModelGenerator;
-
 public class MModelGenerator extends X_ING_ModelGenerator {
 	/**
 	 * 

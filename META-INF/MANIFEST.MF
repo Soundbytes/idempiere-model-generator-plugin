@@ -4,7 +4,7 @@ Bundle-Name: INGEINT Model Generator
 Bundle-SymbolicName: com.ingeint.modelgenerator;singleton:=true
 Bundle-Version: 7.1.0.qualifier
 Bundle-Vendor: INGEINT <https:www.//ingeint.com>
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.adempiere.base;bundle-version="5.1.0",
  org.adempiere.plugin.utils;bundle-version="5.1.0",
