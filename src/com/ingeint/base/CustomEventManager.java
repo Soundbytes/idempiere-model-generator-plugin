@@ -24,6 +24,7 @@
 
 package com.ingeint.base;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,22 +83,22 @@ public abstract class CustomEventManager extends AbstractEventHandler implements
 				String tableName = po.get_TableName();
 				if (tableName.equals(eventHandlerWrapper.getTableName()) && eventType.equals(eventHandlerWrapper.getEventType())) {
 					try {
-						CustomEventHandler customEventHandler = eventHandlerWrapper.getEventHandlerClass().newInstance();
+						CustomEventHandler customEventHandler = eventHandlerWrapper.getEventHandlerClass().getDeclaredConstructor().newInstance();
 						log.info(String.format("EventManager [Event Type: %s, Table Name: %s, Custom Event: %s]", eventType, tableName, eventHandlerWrapper.getEventHandlerClass().getName()));
 						customEventHandler.doHandleEvent(po, event);
 						break;
-					} catch (InstantiationException | IllegalAccessException e) {
+					} catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
 						throw new AdempiereException(String.format("EventManager [Event Type: %s, Class %s can not be instantiated for table: %s]", eventType, eventHandlerWrapper.getEventHandlerClass().getName(), tableName), e);
 					}
 				}
 			} else {
 				if (eventType.equals(eventHandlerWrapper.getEventType())) {
 					try {
-						CustomEventHandler customEventHandler = eventHandlerWrapper.getEventHandlerClass().newInstance();
+						CustomEventHandler customEventHandler = eventHandlerWrapper.getEventHandlerClass().getDeclaredConstructor().newInstance();
 						log.info(String.format("EventManager [Event Type: %s, Custom Event: %s]", eventType, eventHandlerWrapper.getEventHandlerClass().getName()));
 						customEventHandler.doHandleEvent(null, event);
 						break;
-					} catch (InstantiationException | IllegalAccessException e) {
+					} catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
 						throw new AdempiereException(String.format("EventManager [Event Type: %s, Class %s can not be instantiated]", eventType, eventHandlerWrapper.getEventHandlerClass().getName()), e);
 					}
 				}

@@ -30,7 +30,7 @@ public class X_ING_ModelGenerator extends PO implements I_ING_ModelGenerator, I_
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20210110L;
+	private static final long serialVersionUID = 20220110L;
 
     /** Standard Constructor */
     public X_ING_ModelGenerator (Properties ctx, int ING_ModelGenerator_ID, String trxName)
@@ -69,6 +69,57 @@ public class X_ING_ModelGenerator extends PO implements I_ING_ModelGenerator, I_
         .append(get_ID()).append("]");
       return sb.toString();
     }
+
+	/** Set Base Class Package Name.
+		@param BaseClassPackage 
+		Name of Dictionary Baseclass Package
+	  */
+	public void setBaseClassPackage (String BaseClassPackage)
+	{
+		set_Value (COLUMNNAME_BaseClassPackage, BaseClassPackage);
+	}
+
+	/** Get Base Class Package Name.
+		@return Name of Dictionary Baseclass Package
+	  */
+	public String getBaseClassPackage () 
+	{
+		return (String)get_Value(COLUMNNAME_BaseClassPackage);
+	}
+
+	/** Set Generate Model Class (Stub).
+		@param CustomizableModelGenProcess 
+		Generates the Model class (Stub).
+	  */
+	public void setCustomizableModelGenProcess (String CustomizableModelGenProcess)
+	{
+		set_Value (COLUMNNAME_CustomizableModelGenProcess, CustomizableModelGenProcess);
+	}
+
+	/** Get Generate Model Class (Stub).
+		@return Generates the Model class (Stub).
+	  */
+	public String getCustomizableModelGenProcess () 
+	{
+		return (String)get_Value(COLUMNNAME_CustomizableModelGenProcess);
+	}
+
+	/** Set Custom Prefix.
+		@param CustomPrefix 
+		Prefix for Custom entities
+	  */
+	public void setCustomPrefix (String CustomPrefix)
+	{
+		set_Value (COLUMNNAME_CustomPrefix, CustomPrefix);
+	}
+
+	/** Get Custom Prefix.
+		@return Prefix for Custom entities
+	  */
+	public String getCustomPrefix () 
+	{
+		return (String)get_Value(COLUMNNAME_CustomPrefix);
+	}
 
 	/** EntityTypeFilter AD_Reference_ID=389 */
 	public static final int ENTITYTYPEFILTER_AD_Reference_ID=389;
@@ -183,38 +234,45 @@ public class X_ING_ModelGenerator extends PO implements I_ING_ModelGenerator, I_
 		return ii.intValue();
 	}
 
-	/** Set Generate Model Class (Stub).
-		@param MModelGeneratorProcess 
-		Generates the Model class (Stub).
+	/** Set Core Table.
+		@param IsCoreTable 
+		Table is in iDempiereCore (Not a custom Table)
 	  */
-	public void setMModelGeneratorProcess (String MModelGeneratorProcess)
+	public void setIsCoreTable (boolean IsCoreTable)
 	{
-		set_Value (COLUMNNAME_MModelGeneratorProcess, MModelGeneratorProcess);
+		set_Value (COLUMNNAME_IsCoreTable, Boolean.valueOf(IsCoreTable));
 	}
 
-	/** Get Generate Model Class (Stub).
-		@return Generates the Model class (Stub).
+	/** Get Core Table.
+		@return Table is in iDempiereCore (Not a custom Table)
 	  */
-	public String getMModelGeneratorProcess () 
+	public boolean isCoreTable () 
 	{
-		return (String)get_Value(COLUMNNAME_MModelGeneratorProcess);
+		Object oo = get_Value(COLUMNNAME_IsCoreTable);
+		if (oo != null) 
+		{
+			 if (oo instanceof Boolean) 
+				 return ((Boolean)oo).booleanValue(); 
+			return "Y".equals(oo);
+		}
+		return false;
 	}
 
 	/** Set Interface and Model Base Class.
-		@param ModelGeneratorProcess 
+		@param ModelGenProcess 
 		Generates the interface and model base classes.
 	  */
-	public void setModelGeneratorProcess (String ModelGeneratorProcess)
+	public void setModelGenProcess (String ModelGenProcess)
 	{
-		set_Value (COLUMNNAME_ModelGeneratorProcess, ModelGeneratorProcess);
+		set_Value (COLUMNNAME_ModelGenProcess, ModelGenProcess);
 	}
 
 	/** Get Interface and Model Base Class.
 		@return Generates the interface and model base classes.
 	  */
-	public String getModelGeneratorProcess () 
+	public String getModelGenProcess () 
 	{
-		return (String)get_Value(COLUMNNAME_ModelGeneratorProcess);
+		return (String)get_Value(COLUMNNAME_ModelGenProcess);
 	}
 
 	/** Set Package Name.

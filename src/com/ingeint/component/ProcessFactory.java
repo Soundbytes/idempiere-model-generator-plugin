@@ -43,8 +43,8 @@ public class ProcessFactory extends CustomProcessFactory {
 	@Override
 	protected void initialize() {
 		registerProcess(com.ingeint.process.PPrintPluginInfo.class);
-		registerProcess(com.ingeint.process.ModelGeneratorProcess.class);
-		registerProcess(com.ingeint.process.MModelGeneratorProcess.class);
+		registerProcess(com.ingeint.process.ModelGenProcess.class);
+		registerProcess(com.ingeint.process.CustomizableModelGenProcess.class);
 	}
 
 }

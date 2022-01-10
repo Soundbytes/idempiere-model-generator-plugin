@@ -25,35 +25,34 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Collection;
 import java.util.StringTokenizer;
-import java.util.TreeSet;
 import java.util.logging.Level;
 
 import org.adempiere.exceptions.DBException;
-import org.adempiere.util.ModelInterfaceGenerator;
 import org.adempiere.webui.apps.AEnv;
 import org.adempiere.webui.component.Messagebox;
 import org.compiere.Adempiere;
-import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.compiere.util.Util;
+
+import com.ingeint.process.ModelGenProcessBase;
 
 /**
  *  Generate MModel Classes extending the corresponding X_Model Class.
  *
  */
-public class MModelClassGenerator
+public class CustomizableModelGen extends ModelGen
 {
 	/**
 	 * 	Generate PO Class
 	 * 	@param AD_Table_ID table id
-	 * 	@param directory directory
-	 * 	@param packageName package name
+	 * @param directory directory
+	 * @param packageName package name
+	 * @param process TODO
 	 */
-	public MModelClassGenerator (int AD_Table_ID, String directory, String packageName)
+	public CustomizableModelGen (int AD_Table_ID, String directory, String packageName, ModelGenProcessBase process)
 	{
-		this.packageName = packageName;
+		super(AD_Table_ID, directory, packageName, (String)null, process);
 
 		StringBuilder sb = new StringBuilder();
 
@@ -72,15 +71,6 @@ public class MModelClassGenerator
 */		
 	}
 
-	public static final String NL = "\n";
-
-	/**	Logger			*/
-	private static final CLogger	log	= CLogger.getCLogger (MModelClassGenerator.class);
-
-	/** Package Name */
-	private String packageName = "";
-
-
 	/**
 	 * 	Add Header info to buffer
 	 * 	@param AD_Table_ID table
@@ -91,7 +81,6 @@ public class MModelClassGenerator
 	private String createSource (int AD_Table_ID, StringBuilder sb, String packageName)
 	{
 		String tableName = "";
-	//	int accessLevel = 0;
 		String sql = "SELECT TableName, AccessLevel FROM AD_Table WHERE AD_Table_ID=?";
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -103,7 +92,6 @@ public class MModelClassGenerator
 			if (rs.next())
 			{
 				tableName = rs.getString(1);
-	//			accessLevel = rs.getInt(2);
 			}
 		}
 		catch (SQLException e)
@@ -122,11 +110,11 @@ public class MModelClassGenerator
 		String tnStripped = tableName.substring(tableName.indexOf("_")+1);
 		//
 		StringBuilder baseClassName = new StringBuilder("X_").append(tableName);		
-		StringBuilder keyColumn = new StringBuilder().append(tableName).append("_ID");
 		StringBuilder className = new StringBuilder("M").append(Util.replace(tnStripped, "_", ""));
+		StringBuilder keyColumn = new StringBuilder().append(tableName).append("_ID");
 		//
 
-		sb.append (ModelInterfaceGenerator.COPY)
+		sb.append (ModelInterfaceGen.COPY)
 		//	.append ("/** Generated Model - DO NOT CHANGE */").append(NL)
 			.append("package ").append(packageName).append(";").append(NL)
 			.append(NL)
@@ -247,47 +235,6 @@ public class MModelClassGenerator
 		}
 	}
 
-	/** Import classes */
-	private Collection<String> s_importClasses = new TreeSet<String>();
-	/**
-	 * Add class name to class import list
-	 * @param className
-	 */
-	private void addImportClass(String className) {
-		if (className == null
-				|| (className.startsWith("java.lang.") && !className.startsWith("java.lang.reflect."))
-				|| className.startsWith(packageName+"."))
-			return;
-		for(String name : s_importClasses) {
-			if (className.equals(name))
-				return;
-		}
-		s_importClasses.add(className);
-	}
-	/**
-	 * Add class to class import list
-	 * @param cl
-	 */
-	private void addImportClass(Class<?> cl) {
-		if (cl.isArray()) {
-			cl = cl.getComponentType();
-		}
-		if (cl.isPrimitive())
-			return;
-		addImportClass(cl.getCanonicalName());
-	}
-	
-	/**
-	 * Generate java imports
-	 * @param sb
-	 */
-	private void createImports(StringBuilder sb) {
-		for (String name : s_importClasses) {
-			sb.append("import ").append(name).append(";").append(NL);
-		}
-		sb.append(NL);
-	}	
-
 	/**
 	 * 	String representation
 	 * 	@return string representation
@@ -302,10 +249,11 @@ public class MModelClassGenerator
 	 * @param sourceFolder
 	 * @param packageName
 	 * @param entityType
+	 * @param process TODO
 	 * @param tableLike
 	 * @param columnEntityType
 	 */
-	public static void generateSource(String sourceFolder, String packageName, String entityType, String tableName)
+	public static void generateSource(String sourceFolder, String packageName, String entityType, String tableName, ModelGenProcessBase process)
 	{
 		if (sourceFolder == null || sourceFolder.trim().length() == 0)
 			throw new IllegalArgumentException("Must specify source folder");
@@ -393,7 +341,7 @@ public class MModelClassGenerator
 			rs = pstmt.executeQuery();
 			while (rs.next())
 			{
-				new MModelClassGenerator(rs.getInt(1), directory.toString(), packageName);
+				new CustomizableModelGen(rs.getInt(1), directory.toString(), packageName, process);
 			}
 		}
 		catch (SQLException e)

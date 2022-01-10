@@ -64,6 +64,19 @@ public interface I_ING_ModelGenerator
 	  */
 	public int getAD_Org_ID();
 
+    /** Column name BaseClassPackage */
+    public static final String COLUMNNAME_BaseClassPackage = "BaseClassPackage";
+
+	/** Set Base Class Package Name.
+	  * Name of Dictionary Baseclass Package
+	  */
+	public void setBaseClassPackage (String BaseClassPackage);
+
+	/** Get Base Class Package Name.
+	  * Name of Dictionary Baseclass Package
+	  */
+	public String getBaseClassPackage();
+
     /** Column name Created */
     public static final String COLUMNNAME_Created = "Created";
 
@@ -79,6 +92,32 @@ public interface I_ING_ModelGenerator
 	  * User who created this records
 	  */
 	public int getCreatedBy();
+
+    /** Column name CustomizableModelGenProcess */
+    public static final String COLUMNNAME_CustomizableModelGenProcess = "CustomizableModelGenProcess";
+
+	/** Set Generate Model Class (Stub).
+	  * Generates the Model class (Stub).
+	  */
+	public void setCustomizableModelGenProcess (String CustomizableModelGenProcess);
+
+	/** Get Generate Model Class (Stub).
+	  * Generates the Model class (Stub).
+	  */
+	public String getCustomizableModelGenProcess();
+
+    /** Column name CustomPrefix */
+    public static final String COLUMNNAME_CustomPrefix = "CustomPrefix";
+
+	/** Set Custom Prefix.
+	  * Prefix for Custom entities
+	  */
+	public void setCustomPrefix (String CustomPrefix);
+
+	/** Get Custom Prefix.
+	  * Prefix for Custom entities
+	  */
+	public String getCustomPrefix();
 
     /** Column name EntityTypeFilter */
     public static final String COLUMNNAME_EntityTypeFilter = "EntityTypeFilter";
@@ -161,31 +200,31 @@ public interface I_ING_ModelGenerator
 	  */
 	public boolean isActive();
 
-    /** Column name MModelGeneratorProcess */
-    public static final String COLUMNNAME_MModelGeneratorProcess = "MModelGeneratorProcess";
+    /** Column name IsCoreTable */
+    public static final String COLUMNNAME_IsCoreTable = "IsCoreTable";
 
-	/** Set Generate Model Class (Stub).
-	  * Generates the Model class (Stub).
+	/** Set Core Table.
+	  * Table is in iDempiereCore (Not a custom Table)
 	  */
-	public void setMModelGeneratorProcess (String MModelGeneratorProcess);
+	public void setIsCoreTable (boolean IsCoreTable);
 
-	/** Get Generate Model Class (Stub).
-	  * Generates the Model class (Stub).
+	/** Get Core Table.
+	  * Table is in iDempiereCore (Not a custom Table)
 	  */
-	public String getMModelGeneratorProcess();
+	public boolean isCoreTable();
 
-    /** Column name ModelGeneratorProcess */
-    public static final String COLUMNNAME_ModelGeneratorProcess = "ModelGeneratorProcess";
+    /** Column name ModelGenProcess */
+    public static final String COLUMNNAME_ModelGenProcess = "ModelGenProcess";
 
 	/** Set Interface and Model Base Class.
 	  * Generates the interface and model base classes.
 	  */
-	public void setModelGeneratorProcess (String ModelGeneratorProcess);
+	public void setModelGenProcess (String ModelGenProcess);
 
 	/** Get Interface and Model Base Class.
 	  * Generates the interface and model base classes.
 	  */
-	public String getModelGeneratorProcess();
+	public String getModelGenProcess();
 
     /** Column name PackageName */
     public static final String COLUMNNAME_PackageName = "PackageName";
