@@ -299,11 +299,13 @@ public class ModelGen
 
 		addImportClass(java.util.Properties.class);
 		addImportClass(java.sql.ResultSet.class);
-		if (!packageName.equals("org.compiere.model"))
-			addImportClass("org.compiere.model.*");
-		// add base class if Table is core
-		if(m_process.isCoreTable() && m_process.isBaseClass())
-			addImportClass(new StringBuilder(m_process.getBaseClassPackage()).append(".").append(baseClassName).toString());
+//		if (!packageName.equals("org.compiere.model"))
+//			addImportClass("org.compiere.model.*");
+		if(m_process.isCoreTable()) {
+			if (m_process.isBaseClass()) // add base class if Table is core
+				addImportClass(new StringBuilder(m_process.getBaseClassPackage()).append(".").append(baseClassName).toString());
+			addImportClass(m_process.getBaseClassPackage() + ".X_" + tableName); 			
+		}
 		createImports(start);
 		//	Class
 		start.append("/** Generated Model for ").append(tableName).append(NL)
@@ -321,9 +323,6 @@ public class ModelGen
 
 			 // serialVersionUID
 			 .append(NL)
-			 .append("\t/**").append(NL)
-			 .append("\t *").append(NL)
-			 .append("\t */").append(NL)
 			 .append("\tprivate static final long serialVersionUID = ")
 			 .append(String.format("%1$tY%1$tm%1$td", new Timestamp(System.currentTimeMillis())))
 		 	 .append("L;").append(NL)
@@ -331,25 +330,41 @@ public class ModelGen
 
 			//	Standard Constructor
 			 .append(NL)
-			 .append("    /** Standard Constructor */").append(NL)
-			 .append("    public ").append(className).append(" (Properties ctx, int ").append(keyColumn).append(", String trxName)").append(NL)
-			 .append("    {").append(NL)
-			 .append("      super (ctx, ").append(keyColumn).append(", trxName);").append(NL)
-			 .append("      /** if (").append(keyColumn).append(" == 0)").append(NL)
-			 .append("        {").append(NL)
-			 .append(mandatory) //.append(NL)
-			 .append("        } */").append(NL)
-			 .append("    }").append(NL)
+			 .append("\t/**").append(NL)
+			 .append("\t * Standard Constructor").append(NL)
+			 .append("\t */").append(NL)
+			 .append("\tpublic ").append(className).append(" (Properties ctx, int ").append(keyColumn).append(", String trxName) {").append(NL)
+			 .append("\t\tsuper (ctx, ").append(keyColumn).append(", trxName);").append(NL);
+		if (mandatory.length() > 0) {	 
+			start.append("\t\t/** if (").append(keyColumn).append(" == 0)").append(NL)
+				.append("\t\t{").append(NL)
+				.append(mandatory) //.append(NL)
+				.append("\t\t} */").append(NL);
+		}
+		start.append("    }").append(NL)
 			//	Constructor End
 
 			//	Load Constructor
 			 .append(NL)
-			 .append("    /** Load Constructor */").append(NL)
-			 .append("    public ").append(className).append(" (Properties ctx, ResultSet rs, String trxName)").append(NL)
-			 .append("    {").append(NL)
-			 .append("      super (ctx, rs, trxName);").append(NL)
-			 .append("    }").append(NL);
+			 .append("\t/**").append(NL)
+			 .append("\t * Load Constructor").append(NL)
+			 .append("\t */").append(NL)
+			 .append("\tpublic ").append(className).append(" (Properties ctx, ResultSet rs, String trxName) {").append(NL)
+			 .append("\t\tsuper (ctx, rs, trxName);").append(NL)
+			 .append("\t}").append(NL);
+		
 			//	Load Constructor End
+		// Downcast Constructor
+		if (m_process.isCoreTable()) {
+			start.append(NL)
+				.append("\t/**").append(NL)
+				.append("\t * Downcast Constructor").append(NL)
+				.append("\t */").append(NL)
+				.append("\tpublic ").append(className).append(" (X_").append(tableName).append(" base) {").append(NL)
+				.append("\t\tsuper (base.getCtx(), 0, base.get_TrxName());").append(NL)
+				.append("\t\tdowncast(this, base);").append(NL)
+				.append("\t}").append(NL);			
+		} // Downcast Constructor End
 		
 		// TODO Add Factory M-class constructors if core table
 
@@ -380,36 +395,33 @@ public class ModelGen
 //			 .append(NL)
 //			 .append("    protected BigDecimal accessLevel = BigDecimal.valueOf(").append(accessLevel).append(");").append(NL)
 			start.append(NL)
-				 .append("    /** AccessLevel").append(NL)
-				 .append("      * @return ").append(accessLevelInfo).append(NL)
-				 .append("      */").append(NL)
-				 .append("    protected int get_AccessLevel()").append(NL)
-				 .append("    {").append(NL)
-				 .append("      return accessLevel.intValue();").append(NL)
-				 .append("    }").append(NL);
+				 .append("\t/** AccessLevel").append(NL)
+				 .append("\t * @return ").append(accessLevelInfo).append(NL)
+				 .append("\t */").append(NL)
+				 .append("\tprotected int get_AccessLevel() {").append(NL)
+				 .append("\t\treturn accessLevel.intValue();").append(NL)
+				 .append("\t}").append(NL);
 		// initPO
 		start.append(NL)
-			 .append("    /** Load Meta Data */").append(NL)
-			 .append("    protected POInfo initPO (Properties ctx)").append(NL)
-			 .append("    {").append(NL)
-			 .append("      POInfo poi = POInfo.getPOInfo (ctx, Table_ID, get_TrxName());").append(NL)
-			 .append("      return poi;").append(NL)
-			 .append("    }").append(NL);
+			 .append("\t/** Load Meta Data */").append(NL)
+			 .append("\tprotected POInfo initPO (Properties ctx) {").append(NL)
+			 .append("\t\tPOInfo poi = POInfo.getPOInfo (ctx, Table_ID, get_TrxName());").append(NL)
+			 .append("\t\treturn poi;").append(NL)
+			 .append("\t}").append(NL);
 			// initPO
 
 		final String sqlCol = "SELECT COUNT(*) FROM AD_Column WHERE AD_Table_ID=? AND ColumnName=? AND IsActive='Y'";
 		boolean hasName = (DB.getSQLValue(null, sqlCol, AD_Table_ID, "Name") == 1);
 			// toString()
 		start.append(NL)
-			 .append("    public String toString()").append(NL)
-			 .append("    {").append(NL)
-			 .append("      StringBuilder sb = new StringBuilder (\"").append(className).append("[\")").append(NL)
-			 .append("        .append(get_ID())");
+			 .append("\tpublic String toString() {").append(NL)
+			 .append("\t\tStringBuilder sb = new StringBuilder (\"").append(className).append("[\")").append(NL)
+			 .append("\t\t\t.append(get_ID())");
 		if (hasName)
 			start.append(".append(\",Name=\").append(getName())");
 		start.append(".append(\"]\");").append(NL)
-			 .append("      return sb.toString();").append(NL)
-			 .append("    }").append(NL)
+			 .append("\t\treturn sb.toString();").append(NL)
+			 .append("\t}").append(NL)
 		;
 		}
 
@@ -477,7 +489,8 @@ public class ModelGen
 					  		.append("    /** Column name ").append(columnName).append(" */")
 					  		.append(NL)
 					  		.append("    public static final String COLUMNNAME_").append(columnName)
-					  		.append(" = \"").append(columnName).append("\";");
+					  		.append(" = \"").append(columnName).append("\";")
+					  		.append(NL);
 					//
 				}
 				sb.append(
@@ -569,20 +582,21 @@ public class ModelGen
 		if (DisplayType.isID(displayType) && !IsKey)
 		{
 			String fieldName = ModelInterfaceGen.getFieldName(columnName);
-			String referenceClassName = ModelInterfaceGen.getReferenceClassName(AD_Table_ID, columnName, displayType, AD_Reference_ID);
+			String referenceClassName = ModelInterfaceGen.getReferenceClassName(AD_Table_ID, columnName, displayType, AD_Reference_ID, false);
 			//
 			if (fieldName != null && referenceClassName != null)
 			{
+				String typeName = referenceClassName.substring(referenceClassName.lastIndexOf(".") + 1);
 				sb.append(NL)
-				.append("\tpublic ").append(referenceClassName).append(" get").append(fieldName).append("() throws RuntimeException").append(NL)
-				.append("    {").append(NL)
-				.append("\t\treturn (").append(referenceClassName).append(")MTable.get(getCtx(), ").append(referenceClassName).append(".Table_Name)").append(NL)
-				.append("\t\t\t.getPO(get").append(columnName).append("(), get_TrxName());")
+				.append("\tpublic ").append(typeName).append(" get").append(fieldName).append("() throws RuntimeException {").append(NL)
+				.append("\t\treturn (").append(typeName).append(")MTable.get(getCtx(), ").append(typeName).append(".Table_Name)").append(NL)
+				.append("\t\t\t\t.getPO(get").append(columnName).append("(), get_TrxName());").append(NL)
 				/**/
 				.append("\t}").append(NL)
 				;
 				// Add imports:
-				addImportClass(clazz);
+				addImportClass(referenceClassName);
+				addImportClass("org.compiere.model.MTable");
 			}
 		}
 
@@ -590,8 +604,7 @@ public class ModelGen
 		generateJavaSetComment(columnName, Name, Description, sb);
 
 		//	public void setColumn (xxx variable)
-		sb.append("\tpublic void set").append(columnName).append(" (").append(dataType).append(" ").append(columnName).append(")").append(NL)
-			.append("\t{").append(NL)
+		sb.append("\tpublic void set").append(columnName).append(" (").append(dataType).append(" ").append(columnName).append(") {").append(NL)
 		;
 				
 		//	List Validation
@@ -686,8 +699,7 @@ public class ModelGen
 		} else {
 			sb.append(" get").append(columnName);
 		}
-		sb.append(" () ").append(NL)
-			.append("\t{").append(NL)
+		sb.append(" () {").append(NL)
 			.append("\t\t");
 		if (clazz.equals(Integer.class)) {
 			sb.append("Integer ii = (Integer)").append(getValue).append("(").append ("COLUMNNAME_").append(columnName).append(");").append(NL)
@@ -732,30 +744,32 @@ public class ModelGen
 	public void generateJavaSetComment(String columnName, String propertyName, String description, StringBuilder result) {
 
 		result.append(NL)
-			.append("\t/** Set ").append(propertyName).append(".").append(NL)
-			.append("\t\t@param ").append(columnName).append(" ")
+			.append("\t/**").append(NL)
+			.append("\t * Set ").append(propertyName).append(".").append(NL)
+			.append("\t * @param ").append(columnName).append(" ")
 		;
 		if (description != null && description.length() > 0) {
 			result.append(NL)
-				.append("\t\t").append(description).append(NL);
+				.append("\t * ").append(description).append(NL);
 		} else {
 			result.append(propertyName);
 		}
-		result.append("\t  */").append(NL);
+		result.append("\t */").append(NL);
 	}
 
 	//	****** Get Comment ******
 	public void generateJavaGetComment(String propertyName, String description, StringBuilder result) {
 
 		result.append(NL)
-			.append("\t/** Get ").append(propertyName);
+			.append("\t/**").append(NL)
+			.append("\t * Get ").append(propertyName);
 		if (description != null && description.length() > 0) {
 			result.append(".").append(NL)
-				.append("\t\t@return ").append(description).append(NL);
+				.append("\t * @return ").append(description).append(NL);
 		} else {
-			result.append(".\n\t\t@return ").append(propertyName);
+			result.append(".\n\t * @return ").append(propertyName);
 		}
-		result.append("\t  */").append(NL);
+		result.append("\t */").append(NL);
 	}
 
 	/**
@@ -893,13 +907,13 @@ public class ModelGen
 			method = new StringBuilder("String.valueOf(").append(method).append(")");
 
 		StringBuilder sb = new StringBuilder(NL)
-			.append("    /** Get Record ID/ColumnName").append(NL)
-			.append("        @return ID/ColumnName pair").append(NL)
-			.append("      */").append(NL)
-			.append("    public KeyNamePair getKeyNamePair() ").append(NL)
-			.append("    {").append(NL)
-			.append("        return new KeyNamePair(get_ID(), ").append(method).append(");").append(NL)
-			.append("    }").append(NL)
+			.append("\t/**").append(NL)
+			.append("\t * Get Record ID/ColumnName").append(NL)
+			.append("\t * @return ID/ColumnName pair").append(NL)
+			.append("\t */").append(NL)
+			.append("\tpublic KeyNamePair getKeyNamePair() {").append(NL)
+			.append("\t\treturn new KeyNamePair(get_ID(), ").append(method).append(");").append(NL)
+			.append("\t}").append(NL)
 		;
 		addImportClass(org.compiere.util.KeyNamePair.class);
 		return sb;

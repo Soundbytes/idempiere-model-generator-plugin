@@ -645,16 +645,22 @@ public class ModelInterfaceGen
 			fieldName = columnName.substring(0, columnName.length() - 3);
 		return fieldName;
 	}
+	
+	public static String getReferenceClassName(int AD_Table_ID, String columnName, int displayType, int AD_Reference_ID) {
+		return getReferenceClassName(AD_Table_ID, columnName, displayType, AD_Reference_ID,true);
+	}
+	
 
-	public static String getReferenceClassName(int AD_Table_ID, String columnName, int displayType, int AD_Reference_ID)
+	public static String getReferenceClassName(int AD_Table_ID, String columnName, int displayType, int AD_Reference_ID, boolean isInterface)
 	{
 		String referenceClassName = null;
+		String prefix = isInterface ? "I_" : "X_";
 		//
 		if (displayType == DisplayType.TableDir
 				|| (displayType == DisplayType.Search && AD_Reference_ID == 0))
 		{
 			String refTableName = MQuery.getZoomTableName(columnName); // teo_sarca: BF [ 1817768 ] Isolate hardcoded table direct columns
-			referenceClassName = "I_"+refTableName;
+			referenceClassName = "prefix"+refTableName;
 
 			MTable table = MTable.get(Env.getCtx(), refTableName);
 			if (table != null)
@@ -705,7 +711,7 @@ public class ModelInterfaceGen
 					final int refDisplayType = rs.getInt(3);
 					if (refDisplayType == DisplayType.ID)
 					{
-						referenceClassName = "I_"+refTableName;
+						referenceClassName = prefix+refTableName;
 						String modelpackage = getModelPackage(entityType);
 						if (modelpackage != null)
 						{
@@ -730,19 +736,19 @@ public class ModelInterfaceGen
 		}
 		else if (displayType == DisplayType.Location)
 		{
-			referenceClassName = "I_C_Location";
+			referenceClassName = prefix + "C_Location";
 		}
 		else if (displayType == DisplayType.Locator)
 		{
-			referenceClassName = "I_M_Locator";
+			referenceClassName = prefix + "M_Locator";
 		}
 		else if (displayType == DisplayType.Account)
 		{
-			referenceClassName = "I_C_ValidCombination";
+			referenceClassName = prefix + "C_ValidCombination";
 		}
 		else if (displayType == DisplayType.PAttribute)
 		{
-			referenceClassName = "I_M_AttributeSetInstance";
+			referenceClassName = prefix + "M_AttributeSetInstance";
 		}
 		else
 		{
