@@ -87,13 +87,13 @@ public class ModelGen
 	
 	/**
 	 * 	Generate PO Class
-	 * 	@param AD_Table_ID table id
+	 * 	@param tableID table id
 	 * @param directory directory
 	 * @param packageName package name
-	 * @param entityTypeFilter entity type filter for columns
+	 * @param columnEntityTypeFilter entity type filter for columns
 	 * @param process TODO
 	 */
-	public ModelGen (int AD_Table_ID, String directory, String packageName, String entityTypeFilter, ModelGenProcessBase process)
+	public ModelGen (int tableID, String directory, String packageName, String columnEntityTypeFilter, ModelGenProcessBase process)
 	{
 		// add Base Class to Imports
 		m_process = process;
@@ -102,11 +102,11 @@ public class ModelGen
 		//	create column access methods
 		StringBuilder mandatory = new StringBuilder();
 		StringBuilder sb = process.isBaseClass() 
-				? createColumns(AD_Table_ID, mandatory, entityTypeFilter) 
+				? createColumns(tableID, mandatory, columnEntityTypeFilter) 
 				: new StringBuilder("");
 
 		// Header
-		String className = createHeader(AD_Table_ID, sb, mandatory, packageName);
+		String className = createHeader(tableID, sb, mandatory, packageName);
 
 		// Save
 		if ( ! directory.endsWith(File.separator) )
@@ -1006,22 +1006,7 @@ public class ModelGen
 		sql.append(" ORDER BY TableName");
 		//
 		StringBuilder columnFilterBuilder = new StringBuilder();
-		if (process.isCoreTable()) {
-			columnFilterBuilder.append("EntityType IN (");
-			StringTokenizer tokenizer = new StringTokenizer(tableEntityType, ",");
-			int i = 0;
-			while(tokenizer.hasMoreTokens()) {
-				StringBuilder token = new StringBuilder().append(tokenizer.nextToken().trim());
-				if (!token.toString().startsWith("'") || !token.toString().endsWith("'"))
-					token = new StringBuilder("'").append(token).append("'");
-				if (i > 0)
-					columnFilterBuilder.append(",");
-				columnFilterBuilder.append(token);
-				i++;
-			}
-			columnFilterBuilder.append(")");			
-		}
-		else if (!Util.isEmpty(columnEntityType, true)) {
+		if (!Util.isEmpty(columnEntityType, true)) {
 			columnFilterBuilder.append("EntityType IN (");
 			StringTokenizer tokenizer = new StringTokenizer(columnEntityType, ",");
 			int i = 0;

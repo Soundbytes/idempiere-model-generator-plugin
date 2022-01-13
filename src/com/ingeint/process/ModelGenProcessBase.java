@@ -41,8 +41,8 @@ public abstract class ModelGenProcessBase extends CustomProcess{
 		
 		generate(mgen.getFolder(), 
 				mgen.getPackageName(), 
-				mgen.getColumnEntityTypeFilter(), 
 				mgen.getTableEntityTypeFilter(), 
+				mgen.getColumnEntityTypeFilter(), 
 				mgen.getTableName());
 		
 		addBufferLog(mgen.get_ID(), mgen.getCreated(),null,"@ModelGenerated@", mgen.get_Table_ID(),mgen.get_ID());
