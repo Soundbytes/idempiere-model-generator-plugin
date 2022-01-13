@@ -41,14 +41,15 @@ public abstract class ModelGenProcessBase extends CustomProcess{
 		
 		generate(mgen.getFolder(), 
 				mgen.getPackageName(), 
-				mgen.getEntityTypeFilter(), 
+				mgen.getColumnEntityTypeFilter(), 
+				mgen.getTableEntityTypeFilter(), 
 				mgen.getTableName());
 		
 		addBufferLog(mgen.get_ID(), mgen.getCreated(),null,"@ModelGenerated@", mgen.get_Table_ID(),mgen.get_ID());
 		return null;
 	}
 	
-	abstract void generate(String sourceFolder, String packageName,	String entityType, String tableName);
+	abstract void generate(String sourceFolder, String packageName,	String tableEntityType, String columnEntityType, String tableName);
 
 	@Override
 	protected void prepare() {}

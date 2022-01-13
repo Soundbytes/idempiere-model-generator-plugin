@@ -10,7 +10,11 @@ This plugin help to create model of your tables into a plugin, migrated from swi
 
 ## Contributors
 - Orlando Curieles <orlando.curieles@ingeint.com>.
-
+- Andreas Sumerauer <ansum@soundbytes.de>
+- The authors of the original generator classes:
+    - Jörg Janke
+    - Teo Sarca
+    - Victor Perez
 
 ## Instructions
 

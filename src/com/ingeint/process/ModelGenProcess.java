@@ -6,11 +6,11 @@ import com.ingeint.util.ModelInterfaceGen;
 public class ModelGenProcess extends ModelGenProcessBase {
 
 	@Override
-	void generate(String sourceFolder, String packageName, String entityType, String tableName) {
+	void generate(String sourceFolder, String packageName, String tableEntityType, String columnEntityType, String tableName) {
 		if (!m_isCore) {
-			ModelInterfaceGen.generateSource(sourceFolder, packageName, entityType, tableName, null);
+			ModelInterfaceGen.generateSource(sourceFolder, packageName, columnEntityType, tableName, null);
 		} 
 		m_isBaseClass = true;
-		ModelGen.generateSource(sourceFolder, packageName, tableName, entityType, entityType, this);	
+		ModelGen.generateSource(sourceFolder, packageName, tableEntityType, columnEntityType, tableName, this);	
 	}
 }

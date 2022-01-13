@@ -299,8 +299,8 @@ public class ModelGen
 
 		addImportClass(java.util.Properties.class);
 		addImportClass(java.sql.ResultSet.class);
-//		if (!packageName.equals("org.compiere.model"))
-//			addImportClass("org.compiere.model.*");
+		if (!packageName.equals("org.compiere.model"))
+			addImportClass("org.compiere.model.*");
 		if(m_process.isCoreTable()) {
 			if (m_process.isBaseClass()) // add base class if Table is core
 				addImportClass(new StringBuilder(m_process.getBaseClassPackage()).append(".").append(baseClassName).toString());
@@ -929,8 +929,8 @@ public class ModelGen
 	 * @param process TODO
 	 * @param tableLike
 	 */
-	public static void generateSource(String sourceFolder, String packageName, String tableName, 
-			String tableEntityType, String columnEntityType, ModelGenProcessBase process)
+	public static void generateSource(String sourceFolder, String packageName, String tableEntityType, 
+			String columnEntityType, String tableName, ModelGenProcessBase process)
 	{
 		if (sourceFolder == null || sourceFolder.trim().length() == 0)
 			throw new IllegalArgumentException("Must specify source folder");
@@ -950,28 +950,23 @@ public class ModelGen
 			tableLike = new StringBuilder("'").append(tableLike).append("'");
 
 		StringBuilder tableEntityTypeFilter = new StringBuilder();
-		if (process.isCoreTable()) {
-			tableEntityTypeFilter.append("EntityType IN ('D','EE01','EE02','EE04','EE05','WMSTORE')");
-		} else {
-			if (tableEntityType != null && tableEntityType.trim().length() > 0) {
-				tableEntityTypeFilter.append("EntityType IN (");
-				StringTokenizer tokenizer = new StringTokenizer(tableEntityType, ",");
-				int i = 0;
-				while(tokenizer.hasMoreTokens()) {
-					StringBuilder token = new StringBuilder().append(tokenizer.nextToken().trim());
-					if (!token.toString().startsWith("'") || !token.toString().endsWith("'"))
-						token = new StringBuilder("'").append(token).append("'");
-					if (i > 0)
-						tableEntityTypeFilter.append(",");
-					tableEntityTypeFilter.append(token);
-					i++;
-				}
-				tableEntityTypeFilter.append(")");
-			} else {
-				tableEntityTypeFilter.append("EntityType IN ('U','A')");
+		if (tableEntityType != null && tableEntityType.trim().length() > 0) {
+			tableEntityTypeFilter.append("EntityType IN (");
+			StringTokenizer tokenizer = new StringTokenizer(tableEntityType, ",");
+			int i = 0;
+			while(tokenizer.hasMoreTokens()) {
+				StringBuilder token = new StringBuilder().append(tokenizer.nextToken().trim());
+				if (!token.toString().startsWith("'") || !token.toString().endsWith("'"))
+					token = new StringBuilder("'").append(token).append("'");
+				if (i > 0)
+					tableEntityTypeFilter.append(",");
+				tableEntityTypeFilter.append(token);
+				i++;
 			}
+			tableEntityTypeFilter.append(")");
+		} else {
+			tableEntityTypeFilter.append("EntityType IN ('U','A')");
 		}
-
 		StringBuilder directory = new StringBuilder().append(sourceFolder.trim());
 		String packagePath = packageName.replace(".", File.separator);
 		if (!(directory.toString().endsWith("/") || directory.toString().endsWith("\\")))

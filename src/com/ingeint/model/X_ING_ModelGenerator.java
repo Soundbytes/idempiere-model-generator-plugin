@@ -20,6 +20,9 @@ package com.ingeint.model;
 import java.sql.ResultSet;
 import java.util.Properties;
 import org.compiere.model.*;
+import org.compiere.model.MTable;
+import org.compiere.model.X_AD_Table;
+import org.compiere.util.KeyNamePair;
 
 /** Generated Model for ING_ModelGenerator
  *  @author iDempiere (generated) 
@@ -27,227 +30,219 @@ import org.compiere.model.*;
 public class X_ING_ModelGenerator extends PO implements I_ING_ModelGenerator, I_Persistent 
 {
 
+	private static final long serialVersionUID = 20220113L;
+
 	/**
-	 *
+	 * Standard Constructor
 	 */
-	private static final long serialVersionUID = 20220110L;
-
-    /** Standard Constructor */
-    public X_ING_ModelGenerator (Properties ctx, int ING_ModelGenerator_ID, String trxName)
-    {
-      super (ctx, ING_ModelGenerator_ID, trxName);
-      /** if (ING_ModelGenerator_ID == 0)
-        {
-			setING_ModelGenerator_ID (0);
-        } */
+	public X_ING_ModelGenerator (Properties ctx, int ING_ModelGenerator_ID, String trxName) {
+		super (ctx, ING_ModelGenerator_ID, trxName);
     }
 
-    /** Load Constructor */
-    public X_ING_ModelGenerator (Properties ctx, ResultSet rs, String trxName)
-    {
-      super (ctx, rs, trxName);
-    }
+	/**
+	 * Load Constructor
+	 */
+	public X_ING_ModelGenerator (Properties ctx, ResultSet rs, String trxName) {
+		super (ctx, rs, trxName);
+	}
 
-    /** AccessLevel
-      * @return 4 - System 
-      */
-    protected int get_AccessLevel()
-    {
-      return accessLevel.intValue();
-    }
+	/** AccessLevel
+	 * @return 4 - System 
+	 */
+	protected int get_AccessLevel() {
+		return accessLevel.intValue();
+	}
 
-    /** Load Meta Data */
-    protected POInfo initPO (Properties ctx)
-    {
-      POInfo poi = POInfo.getPOInfo (ctx, Table_ID, get_TrxName());
-      return poi;
-    }
+	/** Load Meta Data */
+	protected POInfo initPO (Properties ctx) {
+		POInfo poi = POInfo.getPOInfo (ctx, Table_ID, get_TrxName());
+		return poi;
+	}
 
-    public String toString()
-    {
-      StringBuilder sb = new StringBuilder ("X_ING_ModelGenerator[")
-        .append(get_ID()).append("]");
-      return sb.toString();
-    }
+	public String toString() {
+		StringBuilder sb = new StringBuilder ("X_ING_ModelGenerator[")
+			.append(get_ID()).append("]");
+		return sb.toString();
+	}
 
-	/** Set Base Class Package Name.
-		@param BaseClassPackage 
-		Name of Dictionary Baseclass Package
-	  */
-	public void setBaseClassPackage (String BaseClassPackage)
-	{
+	/**
+	 * Set Base Class Package Name.
+	 * @param BaseClassPackage 
+	 * Name of Dictionary Baseclass Package
+	 */
+	public void setBaseClassPackage (String BaseClassPackage) {
 		set_Value (COLUMNNAME_BaseClassPackage, BaseClassPackage);
 	}
 
-	/** Get Base Class Package Name.
-		@return Name of Dictionary Baseclass Package
-	  */
-	public String getBaseClassPackage () 
-	{
+	/**
+	 * Get Base Class Package Name.
+	 * @return Name of Dictionary Baseclass Package
+	 */
+	public String getBaseClassPackage () {
 		return (String)get_Value(COLUMNNAME_BaseClassPackage);
 	}
 
-	/** Set Generate Model Class (Stub).
-		@param CustomizableModelGenProcess 
-		Generates the Model class (Stub).
-	  */
-	public void setCustomizableModelGenProcess (String CustomizableModelGenProcess)
-	{
+	/** ColumnEntityTypeFilter AD_Reference_ID=389 */
+	public static final int COLUMNENTITYTYPEFILTER_AD_Reference_ID=389;
+	/**
+	 * Set Column Entity Type Filter .
+	 * @param ColumnEntityTypeFilter 
+	 * A list of Entity Types.
+	 */
+	public void setColumnEntityTypeFilter (String ColumnEntityTypeFilter) {
+
+		set_Value (COLUMNNAME_ColumnEntityTypeFilter, ColumnEntityTypeFilter);
+	}
+
+	/**
+	 * Get Column Entity Type Filter .
+	 * @return A list of Entity Types.
+	 */
+	public String getColumnEntityTypeFilter () {
+		return (String)get_Value(COLUMNNAME_ColumnEntityTypeFilter);
+	}
+
+	/**
+	 * Set Generate Model Class (Stub).
+	 * @param CustomizableModelGenProcess 
+	 * Generates the Model class (Stub).
+	 */
+	public void setCustomizableModelGenProcess (String CustomizableModelGenProcess) {
 		set_Value (COLUMNNAME_CustomizableModelGenProcess, CustomizableModelGenProcess);
 	}
 
-	/** Get Generate Model Class (Stub).
-		@return Generates the Model class (Stub).
-	  */
-	public String getCustomizableModelGenProcess () 
-	{
+	/**
+	 * Get Generate Model Class (Stub).
+	 * @return Generates the Model class (Stub).
+	 */
+	public String getCustomizableModelGenProcess () {
 		return (String)get_Value(COLUMNNAME_CustomizableModelGenProcess);
 	}
 
-	/** Set Custom Prefix.
-		@param CustomPrefix 
-		Prefix for Custom entities
-	  */
-	public void setCustomPrefix (String CustomPrefix)
-	{
+	/**
+	 * Set Custom Prefix.
+	 * @param CustomPrefix 
+	 * Prefix for Custom entities
+	 */
+	public void setCustomPrefix (String CustomPrefix) {
 		set_Value (COLUMNNAME_CustomPrefix, CustomPrefix);
 	}
 
-	/** Get Custom Prefix.
-		@return Prefix for Custom entities
-	  */
-	public String getCustomPrefix () 
-	{
+	/**
+	 * Get Custom Prefix.
+	 * @return Prefix for Custom entities
+	 */
+	public String getCustomPrefix () {
 		return (String)get_Value(COLUMNNAME_CustomPrefix);
 	}
 
-	/** EntityTypeFilter AD_Reference_ID=389 */
-	public static final int ENTITYTYPEFILTER_AD_Reference_ID=389;
-	/** Set Entity Type Filter .
-		@param EntityTypeFilter 
-		A list of Entity Types.
-	  */
-	public void setEntityTypeFilter (String EntityTypeFilter)
-	{
-
-		set_Value (COLUMNNAME_EntityTypeFilter, EntityTypeFilter);
-	}
-
-	/** Get Entity Type Filter .
-		@return A list of Entity Types.
-	  */
-	public String getEntityTypeFilter () 
-	{
-		return (String)get_Value(COLUMNNAME_EntityTypeFilter);
-	}
-
-	/** Set Folder.
-		@param Folder 
-		A folder on a local or remote system to store data into
-	  */
-	public void setFolder (String Folder)
-	{
+	/**
+	 * Set Folder.
+	 * @param Folder 
+	 * A folder on a local or remote system to store data into
+	 */
+	public void setFolder (String Folder) {
 		set_Value (COLUMNNAME_Folder, Folder);
 	}
 
-	/** Get Folder.
-		@return A folder on a local or remote system to store data into
-	  */
-	public String getFolder () 
-	{
+	/**
+	 * Get Folder.
+	 * @return A folder on a local or remote system to store data into
+	 */
+	public String getFolder () {
 		return (String)get_Value(COLUMNNAME_Folder);
 	}
 
-	/** Set Comment/Help.
-		@param Help 
-		Comment or Hint
-	  */
-	public void setHelp (String Help)
-	{
+	/**
+	 * Set Comment/Help.
+	 * @param Help 
+	 * Comment or Hint
+	 */
+	public void setHelp (String Help) {
 		set_Value (COLUMNNAME_Help, Help);
 	}
 
-	/** Get Comment/Help.
-		@return Comment or Hint
-	  */
-	public String getHelp () 
-	{
+	/**
+	 * Get Comment/Help.
+	 * @return Comment or Hint
+	 */
+	public String getHelp () {
 		return (String)get_Value(COLUMNNAME_Help);
 	}
 
-	/** Set Model Generator.
-		@param ING_ModelGenerator_ID Model Generator	  */
-	public void setING_ModelGenerator_ID (int ING_ModelGenerator_ID)
-	{
+	/**
+	 * Set Model Generator.
+	 * @param ING_ModelGenerator_ID Model Generator	 */
+	public void setING_ModelGenerator_ID (int ING_ModelGenerator_ID) {
 		if (ING_ModelGenerator_ID < 1) 
 			set_ValueNoCheck (COLUMNNAME_ING_ModelGenerator_ID, null);
 		else 
 			set_ValueNoCheck (COLUMNNAME_ING_ModelGenerator_ID, Integer.valueOf(ING_ModelGenerator_ID));
 	}
 
-	/** Get Model Generator.
-		@return Model Generator	  */
-	public int getING_ModelGenerator_ID () 
-	{
+	/**
+	 * Get Model Generator.
+	 * @return Model Generator	 */
+	public int getING_ModelGenerator_ID () {
 		Integer ii = (Integer)get_Value(COLUMNNAME_ING_ModelGenerator_ID);
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
 	}
 
-	/** Set ING_ModelGenerator_UU.
-		@param ING_ModelGenerator_UU ING_ModelGenerator_UU	  */
-	public void setING_ModelGenerator_UU (String ING_ModelGenerator_UU)
-	{
+	/**
+	 * Set ING_ModelGenerator_UU.
+	 * @param ING_ModelGenerator_UU ING_ModelGenerator_UU	 */
+	public void setING_ModelGenerator_UU (String ING_ModelGenerator_UU) {
 		set_Value (COLUMNNAME_ING_ModelGenerator_UU, ING_ModelGenerator_UU);
 	}
 
-	/** Get ING_ModelGenerator_UU.
-		@return ING_ModelGenerator_UU	  */
-	public String getING_ModelGenerator_UU () 
-	{
+	/**
+	 * Get ING_ModelGenerator_UU.
+	 * @return ING_ModelGenerator_UU	 */
+	public String getING_ModelGenerator_UU () {
 		return (String)get_Value(COLUMNNAME_ING_ModelGenerator_UU);
 	}
 
-	public org.compiere.model.I_AD_Table getING_Table() throws RuntimeException
-    {
-		return (org.compiere.model.I_AD_Table)MTable.get(getCtx(), org.compiere.model.I_AD_Table.Table_Name)
-			.getPO(getING_Table_ID(), get_TrxName());	}
+	public X_AD_Table getING_Table() throws RuntimeException {
+		return (X_AD_Table)MTable.get(getCtx(), X_AD_Table.Table_Name)
+				.getPO(getING_Table_ID(), get_TrxName());
+	}
 
-	/** Set ING_Table_ID.
-		@param ING_Table_ID ING_Table_ID	  */
-	public void setING_Table_ID (int ING_Table_ID)
-	{
+	/**
+	 * Set ING_Table_ID.
+	 * @param ING_Table_ID ING_Table_ID	 */
+	public void setING_Table_ID (int ING_Table_ID) {
 		if (ING_Table_ID < 1) 
 			set_Value (COLUMNNAME_ING_Table_ID, null);
 		else 
 			set_Value (COLUMNNAME_ING_Table_ID, Integer.valueOf(ING_Table_ID));
 	}
 
-	/** Get ING_Table_ID.
-		@return ING_Table_ID	  */
-	public int getING_Table_ID () 
-	{
+	/**
+	 * Get ING_Table_ID.
+	 * @return ING_Table_ID	 */
+	public int getING_Table_ID () {
 		Integer ii = (Integer)get_Value(COLUMNNAME_ING_Table_ID);
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
 	}
 
-	/** Set Core Table.
-		@param IsCoreTable 
-		Table is in iDempiereCore (Not a custom Table)
-	  */
-	public void setIsCoreTable (boolean IsCoreTable)
-	{
+	/**
+	 * Set Core Table.
+	 * @param IsCoreTable 
+	 * Table is in iDempiereCore (Not a custom Table)
+	 */
+	public void setIsCoreTable (boolean IsCoreTable) {
 		set_Value (COLUMNNAME_IsCoreTable, Boolean.valueOf(IsCoreTable));
 	}
 
-	/** Get Core Table.
-		@return Table is in iDempiereCore (Not a custom Table)
-	  */
-	public boolean isCoreTable () 
-	{
+	/**
+	 * Get Core Table.
+	 * @return Table is in iDempiereCore (Not a custom Table)
+	 */
+	public boolean isCoreTable () {
 		Object oo = get_Value(COLUMNNAME_IsCoreTable);
 		if (oo != null) 
 		{
@@ -258,51 +253,79 @@ public class X_ING_ModelGenerator extends PO implements I_ING_ModelGenerator, I_
 		return false;
 	}
 
-	/** Set Interface and Model Base Class.
-		@param ModelGenProcess 
-		Generates the interface and model base classes.
-	  */
-	public void setModelGenProcess (String ModelGenProcess)
-	{
+	/**
+	 * Set Interface and Model Base Class.
+	 * @param ModelGenProcess 
+	 * Generates the interface and model base classes.
+	 */
+	public void setModelGenProcess (String ModelGenProcess) {
 		set_Value (COLUMNNAME_ModelGenProcess, ModelGenProcess);
 	}
 
-	/** Get Interface and Model Base Class.
-		@return Generates the interface and model base classes.
-	  */
-	public String getModelGenProcess () 
-	{
+	/**
+	 * Get Interface and Model Base Class.
+	 * @return Generates the interface and model base classes.
+	 */
+	public String getModelGenProcess () {
 		return (String)get_Value(COLUMNNAME_ModelGenProcess);
 	}
 
-	/** Set Package Name.
-		@param PackageName Package Name	  */
-	public void setPackageName (String PackageName)
-	{
+	/**
+	 * Set Package Name.
+	 * @param PackageName Package Name	 */
+	public void setPackageName (String PackageName) {
 		set_Value (COLUMNNAME_PackageName, PackageName);
 	}
 
-	/** Get Package Name.
-		@return Package Name	  */
-	public String getPackageName () 
-	{
+	/**
+	 * Get Package Name.
+	 * @return Package Name	 */
+	public String getPackageName () {
 		return (String)get_Value(COLUMNNAME_PackageName);
 	}
 
-	/** Set DB Table Name.
-		@param TableName 
-		Name of the table in the database
-	  */
-	public void setTableName (String TableName)
-	{
+	/** TableEntityTypeFilter AD_Reference_ID=389 */
+	public static final int TABLEENTITYTYPEFILTER_AD_Reference_ID=389;
+	/**
+	 * Set Table Entity Type Filter .
+	 * @param TableEntityTypeFilter 
+	 * A list of Entity Types.
+	 */
+	public void setTableEntityTypeFilter (String TableEntityTypeFilter) {
+
+		set_Value (COLUMNNAME_TableEntityTypeFilter, TableEntityTypeFilter);
+	}
+
+	/**
+	 * Get Table Entity Type Filter .
+	 * @return A list of Entity Types.
+	 */
+	public String getTableEntityTypeFilter () {
+		return (String)get_Value(COLUMNNAME_TableEntityTypeFilter);
+	}
+
+	/**
+	 * Set DB Table Name.
+	 * @param TableName 
+	 * Name of the table in the database
+	 */
+	public void setTableName (String TableName) {
 		set_Value (COLUMNNAME_TableName, TableName);
 	}
 
-	/** Get DB Table Name.
-		@return Name of the table in the database
-	  */
-	public String getTableName () 
-	{
+	/**
+	 * Get DB Table Name.
+	 * @return Name of the table in the database
+	 */
+	public String getTableName () {
 		return (String)get_Value(COLUMNNAME_TableName);
+	}
+
+	/**
+	 * Get Record ID/ColumnName
+	 * @return ID/ColumnName pair
+	 */
+	public KeyNamePair getKeyNamePair() {
+		return new KeyNamePair(get_ID(), getTableName());
 	}
 }

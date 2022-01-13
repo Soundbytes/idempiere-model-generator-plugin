@@ -77,6 +77,19 @@ public interface I_ING_ModelGenerator
 	  */
 	public String getBaseClassPackage();
 
+    /** Column name ColumnEntityTypeFilter */
+    public static final String COLUMNNAME_ColumnEntityTypeFilter = "ColumnEntityTypeFilter";
+
+	/** Set Column Entity Type Filter .
+	  * A list of Entity Types.
+	  */
+	public void setColumnEntityTypeFilter (String ColumnEntityTypeFilter);
+
+	/** Get Column Entity Type Filter .
+	  * A list of Entity Types.
+	  */
+	public String getColumnEntityTypeFilter();
+
     /** Column name Created */
     public static final String COLUMNNAME_Created = "Created";
 
@@ -118,19 +131,6 @@ public interface I_ING_ModelGenerator
 	  * Prefix for Custom entities
 	  */
 	public String getCustomPrefix();
-
-    /** Column name EntityTypeFilter */
-    public static final String COLUMNNAME_EntityTypeFilter = "EntityTypeFilter";
-
-	/** Set Entity Type Filter .
-	  * A list of Entity Types.
-	  */
-	public void setEntityTypeFilter (String EntityTypeFilter);
-
-	/** Get Entity Type Filter .
-	  * A list of Entity Types.
-	  */
-	public String getEntityTypeFilter();
 
     /** Column name Folder */
     public static final String COLUMNNAME_Folder = "Folder";
@@ -234,6 +234,19 @@ public interface I_ING_ModelGenerator
 
 	/** Get Package Name	  */
 	public String getPackageName();
+
+    /** Column name TableEntityTypeFilter */
+    public static final String COLUMNNAME_TableEntityTypeFilter = "TableEntityTypeFilter";
+
+	/** Set Table Entity Type Filter .
+	  * A list of Entity Types.
+	  */
+	public void setTableEntityTypeFilter (String TableEntityTypeFilter);
+
+	/** Get Table Entity Type Filter .
+	  * A list of Entity Types.
+	  */
+	public String getTableEntityTypeFilter();
 
     /** Column name TableName */
     public static final String COLUMNNAME_TableName = "TableName";
