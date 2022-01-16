@@ -1,11 +1,8 @@
 package com.ingeint.callout;
 
-import java.util.List;
-
 import org.compiere.model.MTable;
 import org.compiere.util.DB;
 import org.compiere.util.KeyNamePair;
-import org.compiere.util.Util;
 import org.zkoss.zul.Messagebox;
 
 import com.ingeint.base.CustomCallout;
@@ -19,6 +16,10 @@ public class  ModelGeneratorCallout extends CustomCallout {
 	protected String start() {
 		String tableName;
 		Integer tableID;
+		Integer recordID = (Integer)getTab().getValue(MModelGenerator.COLUMNNAME_ING_ModelGenerator_ID);
+		if (recordID == null || recordID == 0)
+			return null;
+		
 		switch(getField().getColumnName()) {
 		case MModelGenerator.COLUMNNAME_ING_Table_ID:
 			tableID = (Integer)getValue();
