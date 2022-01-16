@@ -19,18 +19,21 @@ package com.ingeint.model;
 
 import java.sql.ResultSet;
 import java.util.Properties;
-import org.compiere.model.*;
+import org.compiere.model.I_Persistent;
 import org.compiere.model.MTable;
+import org.compiere.model.PO;
+import org.compiere.model.POInfo;
 import org.compiere.model.X_AD_Table;
 import org.compiere.util.KeyNamePair;
 
-/** Generated Model for ING_ModelGenerator
- *  @author iDempiere (generated) 
- *  @version Release 8.2 - $Id$ */
-public class X_ING_ModelGenerator extends PO implements I_ING_ModelGenerator, I_Persistent 
-{
+/**
+ * Generated Model for ING_ModelGenerator
+ * @author iDempiere (generated) 
+ * @version Release 8.2 - $Id$
+ */
+public class X_ING_ModelGenerator extends PO implements I_ING_ModelGenerator, I_Persistent {
 
-	private static final long serialVersionUID = 20220113L;
+	private static final long serialVersionUID = 20220115L;
 
 	/**
 	 * Standard Constructor
@@ -46,14 +49,17 @@ public class X_ING_ModelGenerator extends PO implements I_ING_ModelGenerator, I_
 		super (ctx, rs, trxName);
 	}
 
-	/** AccessLevel
+	/**
+	 * AccessLevel
 	 * @return 4 - System 
 	 */
 	protected int get_AccessLevel() {
 		return accessLevel.intValue();
 	}
 
-	/** Load Meta Data */
+	/**
+	 * Load Meta Data
+	 */
 	protected POInfo initPO (Properties ctx) {
 		POInfo poi = POInfo.getPOInfo (ctx, Table_ID, get_TrxName());
 		return poi;
@@ -70,8 +76,8 @@ public class X_ING_ModelGenerator extends PO implements I_ING_ModelGenerator, I_
 	 * @param BaseClassPackage 
 	 * Name of Dictionary Baseclass Package
 	 */
-	public void setBaseClassPackage (String BaseClassPackage) {
-		set_Value (COLUMNNAME_BaseClassPackage, BaseClassPackage);
+	public void setBaseClassPackage (String baseClassPackage) {
+		set_Value (COLUMNNAME_BaseClassPackage, baseClassPackage);
 	}
 
 	/**
@@ -89,9 +95,9 @@ public class X_ING_ModelGenerator extends PO implements I_ING_ModelGenerator, I_
 	 * @param ColumnEntityTypeFilter 
 	 * A list of Entity Types.
 	 */
-	public void setColumnEntityTypeFilter (String ColumnEntityTypeFilter) {
+	public void setColumnEntityTypeFilter (String columnEntityTypeFilter) {
 
-		set_Value (COLUMNNAME_ColumnEntityTypeFilter, ColumnEntityTypeFilter);
+		set_Value (COLUMNNAME_ColumnEntityTypeFilter, columnEntityTypeFilter);
 	}
 
 	/**
@@ -107,8 +113,8 @@ public class X_ING_ModelGenerator extends PO implements I_ING_ModelGenerator, I_
 	 * @param CustomizableModelGenProcess 
 	 * Generates the Model class (Stub).
 	 */
-	public void setCustomizableModelGenProcess (String CustomizableModelGenProcess) {
-		set_Value (COLUMNNAME_CustomizableModelGenProcess, CustomizableModelGenProcess);
+	public void setCustomizableModelGenProcess (String customizableModelGenProcess) {
+		set_Value (COLUMNNAME_CustomizableModelGenProcess, customizableModelGenProcess);
 	}
 
 	/**
@@ -124,8 +130,8 @@ public class X_ING_ModelGenerator extends PO implements I_ING_ModelGenerator, I_
 	 * @param CustomPrefix 
 	 * Prefix for Custom entities
 	 */
-	public void setCustomPrefix (String CustomPrefix) {
-		set_Value (COLUMNNAME_CustomPrefix, CustomPrefix);
+	public void setCustomPrefix (String customPrefix) {
+		set_Value (COLUMNNAME_CustomPrefix, customPrefix);
 	}
 
 	/**
@@ -141,8 +147,8 @@ public class X_ING_ModelGenerator extends PO implements I_ING_ModelGenerator, I_
 	 * @param Folder 
 	 * A folder on a local or remote system to store data into
 	 */
-	public void setFolder (String Folder) {
-		set_Value (COLUMNNAME_Folder, Folder);
+	public void setFolder (String folder) {
+		set_Value (COLUMNNAME_Folder, folder);
 	}
 
 	/**
@@ -154,12 +160,36 @@ public class X_ING_ModelGenerator extends PO implements I_ING_ModelGenerator, I_
 	}
 
 	/**
+	 * Set Has Custom Columns.
+	 * @param HasCustomColumns 
+	 * Model generation is skipped if no custom columns are present
+	 */
+	public void setHasCustomColumns (boolean hasCustomColumns) {
+		set_Value (COLUMNNAME_HasCustomColumns, Boolean.valueOf(hasCustomColumns));
+	}
+
+	/**
+	 * Get Has Custom Columns.
+	 * @return Model generation is skipped if no custom columns are present
+	 */
+	public boolean isHasCustomColumns () {
+		Object oo = get_Value(COLUMNNAME_HasCustomColumns);
+		if (oo != null) 
+		{
+			 if (oo instanceof Boolean) 
+				 return ((Boolean)oo).booleanValue(); 
+			return "Y".equals(oo);
+		}
+		return false;
+	}
+
+	/**
 	 * Set Comment/Help.
 	 * @param Help 
 	 * Comment or Hint
 	 */
-	public void setHelp (String Help) {
-		set_Value (COLUMNNAME_Help, Help);
+	public void setHelp (String help) {
+		set_Value (COLUMNNAME_Help, help);
 	}
 
 	/**
@@ -172,17 +202,19 @@ public class X_ING_ModelGenerator extends PO implements I_ING_ModelGenerator, I_
 
 	/**
 	 * Set Model Generator.
-	 * @param ING_ModelGenerator_ID Model Generator	 */
-	public void setING_ModelGenerator_ID (int ING_ModelGenerator_ID) {
-		if (ING_ModelGenerator_ID < 1) 
+	 * @param ING_ModelGenerator_ID Model Generator
+	 */
+	public void setING_ModelGenerator_ID (int modelGeneratorID) {
+		if (modelGeneratorID < 1) 
 			set_ValueNoCheck (COLUMNNAME_ING_ModelGenerator_ID, null);
 		else 
-			set_ValueNoCheck (COLUMNNAME_ING_ModelGenerator_ID, Integer.valueOf(ING_ModelGenerator_ID));
+			set_ValueNoCheck (COLUMNNAME_ING_ModelGenerator_ID, Integer.valueOf(modelGeneratorID));
 	}
 
 	/**
 	 * Get Model Generator.
-	 * @return Model Generator	 */
+	 * @return Model Generator
+	 */
 	public int getING_ModelGenerator_ID () {
 		Integer ii = (Integer)get_Value(COLUMNNAME_ING_ModelGenerator_ID);
 		if (ii == null)
@@ -192,14 +224,16 @@ public class X_ING_ModelGenerator extends PO implements I_ING_ModelGenerator, I_
 
 	/**
 	 * Set ING_ModelGenerator_UU.
-	 * @param ING_ModelGenerator_UU ING_ModelGenerator_UU	 */
-	public void setING_ModelGenerator_UU (String ING_ModelGenerator_UU) {
-		set_Value (COLUMNNAME_ING_ModelGenerator_UU, ING_ModelGenerator_UU);
+	 * @param ING_ModelGenerator_UU ING_ModelGenerator_UU
+	 */
+	public void setING_ModelGenerator_UU (String modelGeneratorUU) {
+		set_Value (COLUMNNAME_ING_ModelGenerator_UU, modelGeneratorUU);
 	}
 
 	/**
 	 * Get ING_ModelGenerator_UU.
-	 * @return ING_ModelGenerator_UU	 */
+	 * @return ING_ModelGenerator_UU
+	 */
 	public String getING_ModelGenerator_UU () {
 		return (String)get_Value(COLUMNNAME_ING_ModelGenerator_UU);
 	}
@@ -211,17 +245,19 @@ public class X_ING_ModelGenerator extends PO implements I_ING_ModelGenerator, I_
 
 	/**
 	 * Set ING_Table_ID.
-	 * @param ING_Table_ID ING_Table_ID	 */
-	public void setING_Table_ID (int ING_Table_ID) {
-		if (ING_Table_ID < 1) 
+	 * @param ING_Table_ID ING_Table_ID
+	 */
+	public void setING_Table_ID (int tableID) {
+		if (tableID < 1) 
 			set_Value (COLUMNNAME_ING_Table_ID, null);
 		else 
-			set_Value (COLUMNNAME_ING_Table_ID, Integer.valueOf(ING_Table_ID));
+			set_Value (COLUMNNAME_ING_Table_ID, Integer.valueOf(tableID));
 	}
 
 	/**
 	 * Get ING_Table_ID.
-	 * @return ING_Table_ID	 */
+	 * @return ING_Table_ID
+	 */
 	public int getING_Table_ID () {
 		Integer ii = (Integer)get_Value(COLUMNNAME_ING_Table_ID);
 		if (ii == null)
@@ -234,8 +270,8 @@ public class X_ING_ModelGenerator extends PO implements I_ING_ModelGenerator, I_
 	 * @param IsCoreTable 
 	 * Table is in iDempiereCore (Not a custom Table)
 	 */
-	public void setIsCoreTable (boolean IsCoreTable) {
-		set_Value (COLUMNNAME_IsCoreTable, Boolean.valueOf(IsCoreTable));
+	public void setIsCoreTable (boolean isCoreTable) {
+		set_Value (COLUMNNAME_IsCoreTable, Boolean.valueOf(isCoreTable));
 	}
 
 	/**
@@ -258,8 +294,8 @@ public class X_ING_ModelGenerator extends PO implements I_ING_ModelGenerator, I_
 	 * @param ModelGenProcess 
 	 * Generates the interface and model base classes.
 	 */
-	public void setModelGenProcess (String ModelGenProcess) {
-		set_Value (COLUMNNAME_ModelGenProcess, ModelGenProcess);
+	public void setModelGenProcess (String modelGenProcess) {
+		set_Value (COLUMNNAME_ModelGenProcess, modelGenProcess);
 	}
 
 	/**
@@ -272,14 +308,16 @@ public class X_ING_ModelGenerator extends PO implements I_ING_ModelGenerator, I_
 
 	/**
 	 * Set Package Name.
-	 * @param PackageName Package Name	 */
-	public void setPackageName (String PackageName) {
-		set_Value (COLUMNNAME_PackageName, PackageName);
+	 * @param PackageName Package Name
+	 */
+	public void setPackageName (String packageName) {
+		set_Value (COLUMNNAME_PackageName, packageName);
 	}
 
 	/**
 	 * Get Package Name.
-	 * @return Package Name	 */
+	 * @return Package Name
+	 */
 	public String getPackageName () {
 		return (String)get_Value(COLUMNNAME_PackageName);
 	}
@@ -291,9 +329,9 @@ public class X_ING_ModelGenerator extends PO implements I_ING_ModelGenerator, I_
 	 * @param TableEntityTypeFilter 
 	 * A list of Entity Types.
 	 */
-	public void setTableEntityTypeFilter (String TableEntityTypeFilter) {
+	public void setTableEntityTypeFilter (String tableEntityTypeFilter) {
 
-		set_Value (COLUMNNAME_TableEntityTypeFilter, TableEntityTypeFilter);
+		set_Value (COLUMNNAME_TableEntityTypeFilter, tableEntityTypeFilter);
 	}
 
 	/**
@@ -309,8 +347,8 @@ public class X_ING_ModelGenerator extends PO implements I_ING_ModelGenerator, I_
 	 * @param TableName 
 	 * Name of the table in the database
 	 */
-	public void setTableName (String TableName) {
-		set_Value (COLUMNNAME_TableName, TableName);
+	public void setTableName (String tableName) {
+		set_Value (COLUMNNAME_TableName, tableName);
 	}
 
 	/**

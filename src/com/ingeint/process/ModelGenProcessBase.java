@@ -12,6 +12,7 @@ public abstract class ModelGenProcessBase extends CustomProcess{
 	protected String m_baseClassPackage = null;
 	protected boolean m_isCore = true;
 	protected boolean m_isBaseClass;
+	protected MModelGenerator m_mgen = null;
 	
 	public String getPrefixBase() {
 		return m_prefixBase;
@@ -26,6 +27,10 @@ public abstract class ModelGenProcessBase extends CustomProcess{
 	public String getBaseClassPackage(){
 		return m_baseClassPackage;
 	}
+	
+	public MModelGenerator getMMGen(){
+		return m_mgen;
+	}
 
 	public boolean isBaseClass() {
 		return m_isBaseClass;
@@ -33,19 +38,19 @@ public abstract class ModelGenProcessBase extends CustomProcess{
 	@Override
 	protected String doIt() throws Exception {
 		
-		MModelGenerator mgen = new MModelGenerator(getCtx(), getRecord_ID(), get_TrxName());
-		init(mgen.getTableName(),
-				mgen.isCoreTable(),
-				mgen.getCustomPrefix(), 
-				mgen.getBaseClassPackage());
+		m_mgen = new MModelGenerator(getCtx(), getRecord_ID(), get_TrxName());
+		init(m_mgen.getTableName(),
+				m_mgen.isCoreTable(),
+				m_mgen.getCustomPrefix(), 
+				m_mgen.getBaseClassPackage());
 		
-		generate(mgen.getFolder(), 
-				mgen.getPackageName(), 
-				mgen.getTableEntityTypeFilter(), 
-				mgen.getColumnEntityTypeFilter(), 
-				mgen.getTableName());
+		generate(m_mgen.getFolder(), 
+				m_mgen.getPackageName(), 
+				m_mgen.getTableEntityTypeFilter(), 
+				m_mgen.getColumnEntityTypeFilter(), 
+				m_mgen.getTableName());
 		
-		addBufferLog(mgen.get_ID(), mgen.getCreated(),null,"@ModelGenerated@", mgen.get_Table_ID(),mgen.get_ID());
+		addBufferLog(m_mgen.get_ID(), m_mgen.getCreated(),null,"@ModelGenerated@", m_mgen.get_Table_ID(),m_mgen.get_ID());
 		return null;
 	}
 	

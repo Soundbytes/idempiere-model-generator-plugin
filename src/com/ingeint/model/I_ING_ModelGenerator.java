@@ -18,7 +18,8 @@ package com.ingeint.model;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import org.compiere.model.*;
+import org.compiere.model.I_AD_Table;
+import org.compiere.model.MTable;
 import org.compiere.util.KeyNamePair;
 
 /** Generated Interface for ING_ModelGenerator
@@ -57,7 +58,7 @@ public interface I_ING_ModelGenerator
 	/** Set Organization.
 	  * Organizational entity within client
 	  */
-	public void setAD_Org_ID (int AD_Org_ID);
+	public void setAD_Org_ID (int orgID);
 
 	/** Get Organization.
 	  * Organizational entity within client
@@ -70,7 +71,7 @@ public interface I_ING_ModelGenerator
 	/** Set Base Class Package Name.
 	  * Name of Dictionary Baseclass Package
 	  */
-	public void setBaseClassPackage (String BaseClassPackage);
+	public void setBaseClassPackage (String baseClassPackage);
 
 	/** Get Base Class Package Name.
 	  * Name of Dictionary Baseclass Package
@@ -83,7 +84,7 @@ public interface I_ING_ModelGenerator
 	/** Set Column Entity Type Filter .
 	  * A list of Entity Types.
 	  */
-	public void setColumnEntityTypeFilter (String ColumnEntityTypeFilter);
+	public void setColumnEntityTypeFilter (String columnEntityTypeFilter);
 
 	/** Get Column Entity Type Filter .
 	  * A list of Entity Types.
@@ -112,7 +113,7 @@ public interface I_ING_ModelGenerator
 	/** Set Generate Model Class (Stub).
 	  * Generates the Model class (Stub).
 	  */
-	public void setCustomizableModelGenProcess (String CustomizableModelGenProcess);
+	public void setCustomizableModelGenProcess (String customizableModelGenProcess);
 
 	/** Get Generate Model Class (Stub).
 	  * Generates the Model class (Stub).
@@ -125,7 +126,7 @@ public interface I_ING_ModelGenerator
 	/** Set Custom Prefix.
 	  * Prefix for Custom entities
 	  */
-	public void setCustomPrefix (String CustomPrefix);
+	public void setCustomPrefix (String customPrefix);
 
 	/** Get Custom Prefix.
 	  * Prefix for Custom entities
@@ -138,12 +139,25 @@ public interface I_ING_ModelGenerator
 	/** Set Folder.
 	  * A folder on a local or remote system to store data into
 	  */
-	public void setFolder (String Folder);
+	public void setFolder (String folder);
 
 	/** Get Folder.
 	  * A folder on a local or remote system to store data into
 	  */
 	public String getFolder();
+
+    /** Column name HasCustomColumns */
+    public static final String COLUMNNAME_HasCustomColumns = "HasCustomColumns";
+
+	/** Set Has Custom Columns.
+	  * Model generation is skipped if no custom columns are present
+	  */
+	public void setHasCustomColumns (boolean hasCustomColumns);
+
+	/** Get Has Custom Columns.
+	  * Model generation is skipped if no custom columns are present
+	  */
+	public boolean isHasCustomColumns();
 
     /** Column name Help */
     public static final String COLUMNNAME_Help = "Help";
@@ -151,7 +165,7 @@ public interface I_ING_ModelGenerator
 	/** Set Comment/Help.
 	  * Comment or Hint
 	  */
-	public void setHelp (String Help);
+	public void setHelp (String help);
 
 	/** Get Comment/Help.
 	  * Comment or Hint
@@ -162,7 +176,7 @@ public interface I_ING_ModelGenerator
     public static final String COLUMNNAME_ING_ModelGenerator_ID = "ING_ModelGenerator_ID";
 
 	/** Set Model Generator	  */
-	public void setING_ModelGenerator_ID (int ING_ModelGenerator_ID);
+	public void setING_ModelGenerator_ID (int modelGeneratorID);
 
 	/** Get Model Generator	  */
 	public int getING_ModelGenerator_ID();
@@ -171,7 +185,7 @@ public interface I_ING_ModelGenerator
     public static final String COLUMNNAME_ING_ModelGenerator_UU = "ING_ModelGenerator_UU";
 
 	/** Set ING_ModelGenerator_UU	  */
-	public void setING_ModelGenerator_UU (String ING_ModelGenerator_UU);
+	public void setING_ModelGenerator_UU (String modelGeneratorUU);
 
 	/** Get ING_ModelGenerator_UU	  */
 	public String getING_ModelGenerator_UU();
@@ -180,12 +194,12 @@ public interface I_ING_ModelGenerator
     public static final String COLUMNNAME_ING_Table_ID = "ING_Table_ID";
 
 	/** Set ING_Table_ID	  */
-	public void setING_Table_ID (int ING_Table_ID);
+	public void setING_Table_ID (int tableID);
 
 	/** Get ING_Table_ID	  */
 	public int getING_Table_ID();
 
-	public org.compiere.model.I_AD_Table getING_Table() throws RuntimeException;
+	public I_AD_Table getING_Table() throws RuntimeException;
 
     /** Column name IsActive */
     public static final String COLUMNNAME_IsActive = "IsActive";
@@ -193,7 +207,7 @@ public interface I_ING_ModelGenerator
 	/** Set Active.
 	  * The record is active in the system
 	  */
-	public void setIsActive (boolean IsActive);
+	public void setIsActive (boolean isActive);
 
 	/** Get Active.
 	  * The record is active in the system
@@ -206,7 +220,7 @@ public interface I_ING_ModelGenerator
 	/** Set Core Table.
 	  * Table is in iDempiereCore (Not a custom Table)
 	  */
-	public void setIsCoreTable (boolean IsCoreTable);
+	public void setIsCoreTable (boolean isCoreTable);
 
 	/** Get Core Table.
 	  * Table is in iDempiereCore (Not a custom Table)
@@ -219,7 +233,7 @@ public interface I_ING_ModelGenerator
 	/** Set Interface and Model Base Class.
 	  * Generates the interface and model base classes.
 	  */
-	public void setModelGenProcess (String ModelGenProcess);
+	public void setModelGenProcess (String modelGenProcess);
 
 	/** Get Interface and Model Base Class.
 	  * Generates the interface and model base classes.
@@ -230,7 +244,7 @@ public interface I_ING_ModelGenerator
     public static final String COLUMNNAME_PackageName = "PackageName";
 
 	/** Set Package Name	  */
-	public void setPackageName (String PackageName);
+	public void setPackageName (String packageName);
 
 	/** Get Package Name	  */
 	public String getPackageName();
@@ -241,7 +255,7 @@ public interface I_ING_ModelGenerator
 	/** Set Table Entity Type Filter .
 	  * A list of Entity Types.
 	  */
-	public void setTableEntityTypeFilter (String TableEntityTypeFilter);
+	public void setTableEntityTypeFilter (String tableEntityTypeFilter);
 
 	/** Get Table Entity Type Filter .
 	  * A list of Entity Types.
@@ -254,7 +268,7 @@ public interface I_ING_ModelGenerator
 	/** Set DB Table Name.
 	  * Name of the table in the database
 	  */
-	public void setTableName (String TableName);
+	public void setTableName (String tableName);
 
 	/** Get DB Table Name.
 	  * Name of the table in the database
