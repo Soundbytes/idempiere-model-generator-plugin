@@ -186,11 +186,12 @@ public class ModelInterfaceGen
 			.append("package ").append(packageName).append(";").append(NL)
 		;
 
-		if (!packageName.equals("org.compiere.model")) {
-			addImportClass("org.compiere.model.*");
-		}
+//		if (!packageName.equals("org.compiere.model")) {
+//			addImportClass("org.compiere.model.*");
+//		}
 		addImportClass(java.math.BigDecimal.class);
 		addImportClass(org.compiere.util.KeyNamePair.class);
+		addImportClass("org.compiere.model.MTable");
 
 		createImports(start);
 		// Interface
@@ -353,8 +354,9 @@ public class ModelInterfaceGen
 			// Create Java Comment
 			generateJavaComment("Set", Name, Description, sb);
 			// public void setColumn (xxx variable)
+			String parameterName = ModelGen.getTrunk(columnName, true);
 			sb.append("\tpublic void set").append(columnName).append(" (")
-				.append(dataType).append(" ").append(columnName).append(");");
+				.append(dataType).append(" ").append(parameterName).append(");");
 		}
 
 		// ****** Get Comment ******
@@ -379,9 +381,11 @@ public class ModelInterfaceGen
 			//
 			if (fieldName != null && referenceClassName != null)
 			{
+				String typeName = referenceClassName.substring(referenceClassName.lastIndexOf(".") + 1);
 				sb.append("\n")
-				  .append("\tpublic "+referenceClassName+" get").append(fieldName).append("() throws RuntimeException;");
+				  .append("\tpublic "+typeName+" get").append(fieldName).append("() throws RuntimeException;");
 			}
+			addImportClass(referenceClassName);
 		}
 		addImportClass(clazz);
 		return sb.toString();
@@ -616,6 +620,8 @@ public class ModelInterfaceGen
 			|| (fromEntity.isSystemMaintained() && toEntity.isSystemMaintained())
 			// Not Sys Entity referencing a Sys Entity
 			|| (!fromEntity.isSystemMaintained() && toEntity.isSystemMaintained())
+			// Both entity types from the same manufacturer
+			|| fromEntityType.startsWith(toEntityType.substring(0,2))
 		;
 	}
 
@@ -644,7 +650,8 @@ public class ModelInterfaceGen
 		else
 			fieldName = columnName.substring(0, columnName.length() - 3);
 		return fieldName;
-	}
+	}	
+	
 	
 	public static String getReferenceClassName(int AD_Table_ID, String columnName, int displayType, int AD_Reference_ID) {
 		return getReferenceClassName(AD_Table_ID, columnName, displayType, AD_Reference_ID,true);
@@ -660,7 +667,7 @@ public class ModelInterfaceGen
 				|| (displayType == DisplayType.Search && AD_Reference_ID == 0))
 		{
 			String refTableName = MQuery.getZoomTableName(columnName); // teo_sarca: BF [ 1817768 ] Isolate hardcoded table direct columns
-			referenceClassName = "prefix"+refTableName;
+			referenceClassName = prefix+refTableName;
 
 			MTable table = MTable.get(Env.getCtx(), refTableName);
 			if (table != null)
@@ -736,19 +743,19 @@ public class ModelInterfaceGen
 		}
 		else if (displayType == DisplayType.Location)
 		{
-			referenceClassName = prefix + "C_Location";
+			referenceClassName = getModelPackage("D") + "." + prefix + "C_Location";
 		}
 		else if (displayType == DisplayType.Locator)
 		{
-			referenceClassName = prefix + "M_Locator";
+			referenceClassName = getModelPackage("D") + "." + prefix + "M_Locator";
 		}
 		else if (displayType == DisplayType.Account)
 		{
-			referenceClassName = prefix + "C_ValidCombination";
+			referenceClassName = getModelPackage("D") + "." + prefix + "C_ValidCombination";
 		}
 		else if (displayType == DisplayType.PAttribute)
 		{
-			referenceClassName = prefix + "M_AttributeSetInstance";
+			referenceClassName = getModelPackage("D") + "." + prefix + "M_AttributeSetInstance";
 		}
 		else
 		{
