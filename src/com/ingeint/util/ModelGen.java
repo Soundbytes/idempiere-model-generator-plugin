@@ -440,8 +440,7 @@ public class ModelGen
 				startBottom.append(".append(\",Name=\").append(getName())");
 			startBottom.append(".append(\"]\");").append(NL)
 				 .append("\t\treturn sb.toString();").append(NL)
-				 .append("\t}").append(NL)
-		;
+				 .append("\t}").append(NL);
 		}
 
 		createImports(start);
