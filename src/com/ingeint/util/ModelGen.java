@@ -53,11 +53,11 @@ import org.compiere.util.Util;
 import com.ingeint.process.ModelGenProcessBase;
 
 /**
- *  Generate Model Classes extending PO.
- *  Base class for CMP interface - will be extended to create byte code directly
+ * Generate Model Classes extending PO.
+ * Base class for CMP interface - will be extended to create byte code directly
  *
- *  @author Jorg Janke
- *  @version $Id: GenerateModel.java,v 1.42 2005/05/08 15:16:56 jjanke Exp $
+ * @author Jorg Janke
+ * @version $Id: GenerateModel.java,v 1.42 2005/05/08 15:16:56 jjanke Exp $
  *
  * @author Teo Sarca, SC ARHIPAC SERVICE SRL
  * 				<li>BF [ 1781629 ] Don't use Env.NL in model class/interface generators
@@ -74,9 +74,14 @@ import com.ingeint.process.ModelGenProcessBase;
  *					https://sourceforge.net/tracker/?func=detail&atid=879335&aid=2848449&group_id=176962
  * @author Victor Perez, e-Evolution
  * 				<li>FR [ 1785001 ] Using ModelPackage of EntityType to Generate Model Class
+ * 
+ * @author Andreas Sumerauer
+ * 
  */
 public class ModelGen
 {
+	final static String author = "Andreas Sumerauer";
+
 	public static final String NL = "\n";
 
 	/**	Logger			*/
@@ -316,8 +321,8 @@ public class ModelGen
 		
 		//	Class
 		startBottom.append("/**").append(NL)
-			.append(" * Generated Model for ").append(tableName).append(NL)
-			.append(" * @author iDempiere (generated) ").append(NL)
+			.append(" * ").append(m_process.isBaseClass() ? "Generated" : "Custom").append(" Model for table ").append(tableName).append(NL)
+			.append(" * @author ").append(m_process.isBaseClass() ? "iDempiere (generated)" : author).append(NL)
 			.append(" * @version ").append(Adempiere.MAIN_VERSION).append(" - $Id$").append(NL)
 			.append(" */").append(NL)
 			.append("public class ").append(className)
@@ -371,12 +376,12 @@ public class ModelGen
 				.append("\t */").append(NL)
 				.append("\tpublic ").append(className).append(" (X_").append(tableName).append(" base) {").append(NL)
 				.append("\t\tsuper (base.getCtx(), 0, base.get_TrxName());").append(NL)
-				.append("\t\tdowncast(this, base);").append(NL)
+				.append("\t\tdowncast(base, this);").append(NL)
 				.append("\t}").append(NL);
 			addImportClass(m_process.getBaseClassPackage() + ".X_" + tableName);
 		} // Downcast Constructor End
 		
-		// TODO Add Factory M-class constructors if core table
+		// TODO Add all constructors present in M-class if core table
 
 			// TableName
 //			 .append(NL)
