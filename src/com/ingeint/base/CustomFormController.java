@@ -26,7 +26,7 @@ package com.ingeint.base;
 
 import org.adempiere.exceptions.AdempiereException;
 import org.adempiere.webui.panel.ADForm;
-import org.adempiere.webui.panel.CustomForm;
+//import org.adempiere.webui.panel.CustomForm;
 import org.adempiere.webui.panel.IFormController;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
@@ -37,6 +37,7 @@ import org.zkoss.zk.ui.event.EventListener;
 public abstract class CustomFormController implements IFormController, EventListener<Event> {
 
 	private CustomForm form;
+	
 
 	@Override
 	public ADForm getForm() {
@@ -49,19 +50,29 @@ public abstract class CustomFormController implements IFormController, EventList
 	 * @throws Exception
 	 */
 	public CustomFormController() {
-		form = new CustomForm();
+		this(false);
+	}
+	
+	
+	public CustomFormController(boolean isEmbedded) {
+		form = new CustomForm(isEmbedded);
+		form.setICustomForm(this);
+		
 		try {
 			buildForm();
 		} catch (Exception e) {
-			throw new AdempiereException("Error building form: " + e.getMessage(), e);
+			e.printStackTrace();
+			throw new AdempiereException(e);
 		}
 	}
-
+	
 	/**
 	 * For build form
 	 * 
 	 * @throws Exception
 	 */
 	protected abstract void buildForm() throws Exception;
+
+	protected abstract void initForm();
 
 }

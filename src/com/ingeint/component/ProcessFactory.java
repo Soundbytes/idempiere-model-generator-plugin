@@ -45,6 +45,7 @@ public class ProcessFactory extends CustomProcessFactory {
 		registerProcess(com.ingeint.process.PPrintPluginInfo.class);
 		registerProcess(com.ingeint.process.ModelGenProcess.class);
 		registerProcess(com.ingeint.process.CustomizableModelGenProcess.class);
+		registerProcess(com.ingeint.process.ModelGenMenuProcess.class);
 	}
 
 }

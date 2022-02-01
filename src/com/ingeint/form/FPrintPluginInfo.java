@@ -25,7 +25,6 @@
 package com.ingeint.form;
 
 import org.adempiere.webui.editor.WStringEditor;
-import org.adempiere.webui.panel.CustomForm;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zul.Borderlayout;
@@ -33,6 +32,7 @@ import org.zkoss.zul.Button;
 import org.zkoss.zul.Center;
 import org.zkoss.zul.North;
 import com.ingeint.base.BundleInfo;
+import com.ingeint.base.CustomForm;
 import com.ingeint.base.CustomFormController;
 
 /**
@@ -44,7 +44,7 @@ public class FPrintPluginInfo extends CustomFormController {
 	private WStringEditor pluginInfo;
 
 	@Override
-	protected void buildForm() throws Exception {
+	public void buildForm() throws Exception {
 		CustomForm form = (CustomForm) getForm();
 
 		Borderlayout mainLayout = new Borderlayout();
@@ -77,6 +77,12 @@ public class FPrintPluginInfo extends CustomFormController {
 			BundleInfo bundleInfo = BundleInfo.getInstance();
 			pluginInfo.getComponent().setText(bundleInfo.getBundleID() + " " + bundleInfo.getBundleName() + " " + bundleInfo.getBundleVendor());
 		}
+	}
+
+	@Override
+	protected void initForm() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

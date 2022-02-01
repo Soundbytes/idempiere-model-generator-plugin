@@ -54,6 +54,8 @@ import org.compiere.util.DisplayType;
 import org.compiere.util.Env;
 import org.compiere.util.Util;
 
+import com.ingeint.model.MModelGenerator;
+
 /**
  *	@author Trifon Trifonov
  *	@version $Id$
@@ -784,8 +786,14 @@ public class ModelInterfaceGen
 	 * @param tableLike
 	 * @param columnEntityType
 	 */
-	public static void generateSource(String sourceFolder, String packageName, String entityType, String tableName, String columnEntityType)
+	public static void generateSource(MModelGenerator mmGen)
 	{
+		String sourceFolder = mmGen.getFolder();
+		String packageName = mmGen.getPackageName();
+		String tableName = mmGen.getTableName();
+		String tableEntityType = mmGen.getTableEntityTypeFilter();
+		String columnEntityType = mmGen.getColumnEntityTypeFilter();
+ 		
 		if (sourceFolder == null || sourceFolder.trim().length() == 0)
 			throw new IllegalArgumentException("Must specify source folder");
 
@@ -804,10 +812,10 @@ public class ModelInterfaceGen
 			tableLike = new StringBuilder("'").append(tableLike).append("'");
 
 		StringBuilder entityTypeFilter = new StringBuilder();
-		if (entityType != null && entityType.trim().length() > 0)
+		if (tableEntityType != null && tableEntityType.trim().length() > 0)
 		{
 			entityTypeFilter.append("EntityType IN (");
-			StringTokenizer tokenizer = new StringTokenizer(entityType, ",");
+			StringTokenizer tokenizer = new StringTokenizer(tableEntityType, ",");
 			int i = 0;
 			while(tokenizer.hasMoreTokens()) {
 				StringBuilder token = new StringBuilder(tokenizer.nextToken().trim());

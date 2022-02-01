@@ -50,7 +50,7 @@ import org.compiere.util.DB;
 import org.compiere.util.DisplayType;
 import org.compiere.util.Util;
 
-import com.ingeint.process.ModelGenProcessBase;
+import com.ingeint.model.MModelGenerator;
 
 /**
  * Generate Model Classes extending PO.
@@ -86,10 +86,12 @@ public class ModelGen
 
 	/**	Logger			*/
 	protected static final CLogger	log	= CLogger.getCLogger (ModelGen.class);
-	protected com.ingeint.process.ModelGenProcessBase m_process = null;
+	protected MModelGenerator m_mmGen = null;
 
 	/** Package Name */
 	protected String packageName = "";
+
+	private boolean m_isBaseClass;
 	
 	/**
 	 * Generate PO Class
@@ -97,22 +99,24 @@ public class ModelGen
 	 * @param directory directory
 	 * @param packageName package name
 	 * @param columnEntityTypeFilter entity type filter for columns
-	 * @param process TODO
+	 * @param mmGen TODO
+	 * @param isBaseClass TODO
 	 */
-	public ModelGen (int tableID, String directory, String packageName, String columnEntityTypeFilter, ModelGenProcessBase process)
+	public ModelGen (int tableID, String directory, String packageName, String columnEntityTypeFilter, MModelGenerator mmGen, boolean isBaseClass)
 	{
 		// get columns
 		boolean hasColumns = getColumns(tableID, columnEntityTypeFilter);
-		if (process.getMMGen().isHasCustomColumns() && !hasColumns)
+		if (mmGen.isHasCustomColumns() && !hasColumns)
 			return;
 		
 		// add Base Class to Imports
-		m_process = process;
+		m_mmGen = mmGen;
+		m_isBaseClass = isBaseClass;
 		this.packageName = packageName;
 		
 		//	create column access methods
 		StringBuilder mandatory = new StringBuilder();
-		StringBuilder sb = process.isBaseClass() 
+		StringBuilder sb = isBaseClass 
 				? createColumns(tableID, mandatory) 
 				: new StringBuilder("");
 
@@ -137,7 +141,7 @@ public class ModelGen
 		{
 			Reader fr = null;
 			File out = new File (fileName);
-			if (!m_process.isBaseClass()) {
+			if (!m_isBaseClass) {
 				boolean fileExists = true;
 				try {
 					fr = new InputStreamReader(new FileInputStream(out), "UTF-8");
@@ -207,6 +211,8 @@ public class ModelGen
 	protected Collection<String> s_importClasses = new TreeSet<String>();
 
 	private ColumnData[] m_columnData;
+
+//	private String m_baseClassPackage;
 	/**
 	 * Add class name to class import list
 	 * @param className
@@ -255,6 +261,25 @@ public class ModelGen
 	 */
 	protected String createHeader (int AD_Table_ID, StringBuilder sb, StringBuilder mandatory, String packageName)
 	{
+		String prefixBase;
+		String prefixDerived;
+		String baseClassPackage;
+		if (m_mmGen.isCoreTable()) {
+			if (m_mmGen.getCustomPrefix() == null || Util.isEmpty(m_mmGen.getCustomPrefix())) 
+				throw new IllegalArgumentException("Custom Prefix required for Core Table");
+			if (m_mmGen.getBaseClassPackage() == null || Util.isEmpty(m_mmGen.getBaseClassPackage())) 
+				throw new IllegalArgumentException("Base Class Name required for Core Table");
+
+			
+			prefixBase = new StringBuilder("X").append(m_mmGen.getCustomPrefix()).append("_").toString();
+			prefixDerived = m_mmGen.getCustomPrefix();
+			baseClassPackage  = m_mmGen.getBaseClassPackage();
+		} else {
+			prefixBase = "X_";
+			prefixDerived = "M";
+			baseClassPackage = null;
+		}
+		
 		String tableName = "";
 		int accessLevel = 0;
 		String sql = "SELECT TableName, AccessLevel FROM AD_Table WHERE AD_Table_ID=?";
@@ -289,24 +314,24 @@ public class ModelGen
 		StringBuilder className;
 		StringBuilder baseClassName;
 		
-		if (m_process.isBaseClass()) {
-			className = new StringBuilder(m_process.getPrefixBase()).append(tableName);
-			if (m_process.isCoreTable()) {
+		if (m_isBaseClass) {
+			className = new StringBuilder(prefixBase).append(tableName);
+			if (m_mmGen.isCoreTable()) {
 				baseClassName =  new StringBuilder("M").append(getTrunk(tableName));
-				addImportClass(m_process.getBaseClassPackage() + "." + baseClassName);
+				addImportClass(baseClassPackage + "." + baseClassName);
 			} else {
 				baseClassName =  new StringBuilder("PO");
 				this.addImportClass("org.compiere.model.PO");
 			}
 		} else {
-			className = new StringBuilder(m_process.getPrefixDerived()).append(getTrunk(tableName));
-			baseClassName = new StringBuilder(m_process.isCoreTable() ? m_process.getPrefixBase() : "X_").append(tableName);
+			className = new StringBuilder(prefixDerived).append(getTrunk(tableName));
+			baseClassName = new StringBuilder(m_mmGen.isCoreTable() ? prefixBase : "X_").append(tableName);
 		}
 			
 		//
 		StringBuilder start = new StringBuilder()
 			.append (ModelInterfaceGen.COPY)
-			.append (m_process.isBaseClass() ? "/** Generated Model - DO NOT CHANGE */" : "").append(NL)
+			.append (m_isBaseClass ? "/** Generated Model - DO NOT CHANGE */" : "").append(NL)
 			.append("package ").append(packageName).append(";").append(NL)
 			.append(NL)
 		;
@@ -321,14 +346,14 @@ public class ModelGen
 		
 		//	Class
 		startBottom.append("/**").append(NL)
-			.append(" * ").append(m_process.isBaseClass() ? "Generated" : "Custom").append(" Model for table ").append(tableName).append(NL)
-			.append(" * @author ").append(m_process.isBaseClass() ? "iDempiere (generated)" : author).append(NL)
+			.append(" * ").append(m_isBaseClass ? "Generated" : "Custom").append(" Model for table ").append(tableName).append(NL)
+			.append(" * @author ").append(m_isBaseClass ? "iDempiere (generated)" : author).append(NL)
 			.append(" * @version ").append(Adempiere.MAIN_VERSION).append(" - $Id$").append(NL)
 			.append(" */").append(NL)
 			.append("public class ").append(className)
 		 	.append(" extends ")
 		 	.append(baseClassName);
-		if (m_process.isBaseClass() && !m_process.isCoreTable()) { 	
+		if (m_isBaseClass && !m_mmGen.isCoreTable()) { 	
 			startBottom.append(" implements I_").append(tableName)
 			 	.append(", I_Persistent ");
 			addImportClass("org.compiere.model.I_Persistent");
@@ -369,7 +394,7 @@ public class ModelGen
 		
 			//	Load Constructor End
 		// Downcast Constructor
-		if (m_process.isCoreTable()) {
+		if (m_mmGen.isCoreTable()) {
 			startBottom.append(NL)
 				.append("\t/**").append(NL)
 				.append("\t * Downcast Constructor").append(NL)
@@ -378,7 +403,7 @@ public class ModelGen
 				.append("\t\tsuper (base.getCtx(), 0, base.get_TrxName());").append(NL)
 				.append("\t\tdowncast(base, this);").append(NL)
 				.append("\t}").append(NL);
-			addImportClass(m_process.getBaseClassPackage() + ".X_" + tableName);
+			addImportClass(baseClassPackage + ".X_" + tableName);
 		} // Downcast Constructor End
 		
 		// TODO Add all constructors present in M-class if core table
@@ -397,7 +422,7 @@ public class ModelGen
 //			 .append(NL)
 //			 .append("    protected static KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);").append(NL)
 
-		if(m_process.isBaseClass() && !m_process.isCoreTable()) {
+		if(m_isBaseClass && !m_mmGen.isCoreTable()) {
 			// accessLevel
 			StringBuilder accessLevelInfo = new StringBuilder().append(accessLevel).append(" ");
 			if (accessLevel >= 4 )
@@ -537,7 +562,7 @@ public class ModelGen
 		boolean isKeyNamePairCreated = false; // true if the method "getKeyNamePair" is already generated
 
 		for (ColumnData cd : m_columnData)	{
-			if(m_process.isCoreTable() && m_process.isBaseClass()) {
+			if(m_mmGen.isCoreTable() && m_isBaseClass) {
 				// Create COLUMNNAME_ property 
 				sb.append(NL)
 				  		.append("    /** Column name ").append(cd.columnName).append(" */")
@@ -961,33 +986,33 @@ public class ModelGen
 	 * @param packageName
 	 * @param tableEntityType
 	 * @param columnEntityType
-	 * @param process TODO
+	 * @param mmGen TODO
+	 * @param isBaseClass TODO
 	 * @param tableLike
 	 */
-	public static void generateSource(String sourceFolder, String packageName, String tableEntityType, 
-			String columnEntityType, String tableName, ModelGenProcessBase process)
+	public static void generateSource(MModelGenerator mmGen, boolean isBaseClass)
 	{
-		if (sourceFolder == null || sourceFolder.trim().length() == 0)
+		if (mmGen.getFolder() == null || mmGen.getFolder().trim().length() == 0)
 			throw new IllegalArgumentException("Must specify source folder");
 
-		File file = new File(sourceFolder);
+		File file = new File(mmGen.getFolder());
 		if (!file.exists())
-			throw new IllegalArgumentException("Source folder doesn't exists. sourceFolder="+sourceFolder);
+			throw new IllegalArgumentException("Source folder doesn't exists. sourceFolder="+mmGen.getFolder());
 
-		if (packageName == null || packageName.trim().length() == 0)
+		if (mmGen.getPackageName() == null || mmGen.getPackageName().trim().length() == 0)
 			throw new IllegalArgumentException("Must specify package name");
 
-		if (tableName == null || tableName.trim().length() == 0)
+		if (mmGen.getTableName() == null || mmGen.getTableName().trim().length() == 0)
 			throw new IllegalArgumentException("Must specify table name");
 		
-		StringBuilder tableLike = new StringBuilder().append(tableName.trim());
+		StringBuilder tableLike = new StringBuilder().append(mmGen.getTableName().trim());
 		if (!tableLike.toString().startsWith("'") || !tableLike.toString().endsWith("'"))
 			tableLike = new StringBuilder("'").append(tableLike).append("'");
 
 		StringBuilder tableEntityTypeFilter = new StringBuilder();
-		if (tableEntityType != null && tableEntityType.trim().length() > 0) {
+		if (mmGen.getTableEntityTypeFilter() != null && mmGen.getTableEntityTypeFilter().trim().length() > 0) {
 			tableEntityTypeFilter.append("EntityType IN (");
-			StringTokenizer tokenizer = new StringTokenizer(tableEntityType, ",");
+			StringTokenizer tokenizer = new StringTokenizer(mmGen.getTableEntityTypeFilter(), ",");
 			int i = 0;
 			while(tokenizer.hasMoreTokens()) {
 				StringBuilder token = new StringBuilder().append(tokenizer.nextToken().trim());
@@ -1002,10 +1027,9 @@ public class ModelGen
 		} else {
 			tableEntityTypeFilter.append("EntityType IN ('U','A')");
 		}
-		StringBuilder directory = new StringBuilder().append(sourceFolder.trim());
-		String packagePath = packageName.replace(".", File.separator);
-		if (!(directory.toString().endsWith("/") || directory.toString().endsWith("\\")))
-		{
+		StringBuilder directory = new StringBuilder().append(mmGen.getFolder().trim());
+		String packagePath = mmGen.getPackageName().replace(".", File.separator);
+		if (!(directory.toString().endsWith("/") || directory.toString().endsWith("\\"))) {
 			directory.append(File.separator);
 		}
 		if (File.separator.equals("/"))
@@ -1041,9 +1065,9 @@ public class ModelGen
 		sql.append(" ORDER BY TableName");
 		//
 		StringBuilder columnFilterBuilder = new StringBuilder();
-		if (!Util.isEmpty(columnEntityType, true)) {
+		if (!Util.isEmpty(mmGen.getColumnEntityTypeFilter(), true)) {
 			columnFilterBuilder.append("EntityType IN (");
-			StringTokenizer tokenizer = new StringTokenizer(columnEntityType, ",");
+			StringTokenizer tokenizer = new StringTokenizer(mmGen.getColumnEntityTypeFilter(), ",");
 			int i = 0;
 			while(tokenizer.hasMoreTokens()) {
 				StringBuilder token = new StringBuilder().append(tokenizer.nextToken().trim());
@@ -1062,21 +1086,18 @@ public class ModelGen
 		
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		try
-		{
+		try {
 			pstmt = DB.prepareStatement(sql.toString(), null);
 			rs = pstmt.executeQuery();
 			while (rs.next())
 			{
-				new ModelGen(rs.getInt(1), directory.toString(), packageName, columnFilter, process);
+				new ModelGen(rs.getInt(1), directory.toString(), mmGen.getPackageName(), columnFilter, mmGen, isBaseClass);
 			}
 		}
-		catch (SQLException e)
-		{
+		catch (SQLException e) {
 			throw new DBException(e, sql.toString());
 		}
-		finally
-		{
+		finally {
 			DB.close(rs, pstmt);
 			rs = null; pstmt = null;
 		}
