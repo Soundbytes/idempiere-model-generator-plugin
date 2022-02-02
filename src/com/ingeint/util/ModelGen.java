@@ -36,10 +36,12 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Scanner;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 import java.util.logging.Level;
 
+import org.adempiere.exceptions.AdempiereException;
 import org.adempiere.exceptions.DBException;
 import org.adempiere.webui.apps.AEnv;
 import org.adempiere.webui.component.Messagebox;
@@ -1113,9 +1115,24 @@ public class ModelGen
 						Messagebox.OK, 
 						Messagebox.INFORMATION);
 			}
-			
 		});		
 	}	
+	
+	private String getSerialVersionUID(String fileName) {
+		File file = new File(fileName);
+
+		try (Scanner scanner = new Scanner(file)){
+		    while (scanner.hasNextLine()) {
+		        String line = scanner.nextLine();
+		        if(line.startsWith("\tprivate static final long serialVersionUID = ")) { 
+		            return line;
+		        }
+		    }
+		} catch(FileNotFoundException e) { 
+		   throw new AdempiereException(e); 
+		}
+		return null;
+	}
 	
 	class ColumnData {
 		public String columnName;
