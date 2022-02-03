@@ -4,7 +4,6 @@ This plugin help to create model of your tables into a plugin, migrated from swi
 
 
 - Copyright: INGEINT <http://www.ingeint.com> and Contributors.
-
 - License: GPL 2
 
 
@@ -22,7 +21,6 @@ This plugin help to create model of your tables into a plugin, migrated from swi
 The Model Generator works best with a patched PO.java
 The patch is not required for basic functionality. However if you want 
 to generate model classes that are derived from core models I recommend to install it. (source and instructions at the bottom of this document.)
-
 
 ## Installation
 
@@ -65,9 +63,9 @@ Check the *Create Model Base Class* box to generate ...
 These two classes must never be edited or customized. Instead you will just recreate them whenever you have made changes to the database table definition.
 
 For a new table you might want to also check the *Create Custom Class* box. This will generate a Stub that you can extend with custom functions and data to modify the behavior of the model class.  
-Note: The Model Generator can not be used to overwrite an existing custom class. To do that just delete the existing file before creating the new one. 
+Note: The Model Generator can not be used to overwrite a previously generated custom class. To do that just delete the existing file before creating the new one. 
 
-Hitting OK will save the generator settings and generate the source code files as specified.
+Hitting OK will save the generator settings and generate the source code files as specified.  
 In the Eclipse Project Explorer click on your project's source folder and select refresh from the context menu to make the changes available to the IDE.
 
 ### Extending an existing model
@@ -100,53 +98,60 @@ e.G. a shared interface for MYMovement, MYInOut and MYInventory that extracts th
 #### Notes. Please read carefully
 - The generator does not check whether the referenced parent model class actually exists. In that case You will have to modify the dialog settings in order to create a complete table model within your own project. 
 - The extended models will not inherit any custom constructors from the core model (That is not possible in java I'm afraid.) Constructors have to be propagated explicitly to the child class. I hope to be able to add this functionality in a future version of the generator. 
-- The downcast constructor can only inherit the state of the PO specific Data structures. Any data fields that are specific to the parent class are initialized when the cast is executed. The current state of those fields in the parent object might be different from the newly downcast object's state. 
+- The downcast constructor can only inherit the state of the PO specific Data structures. Any data fields that are special to the parent class are initialized when the cast is executed. The current state of those fields in the parent object might be different from the newly downcast object's state. 
 - CAUTION! Model extensions can only be used within your own project. Make sure that your Model factory never ever injects any of your extended classes into the main application. 
+
+## Model Generator Window.
+
+Any model generator settings are persisted before the model classes/interfaces are created.  
+Existing generator settings can be managed through the Model Generator window.
+The generator process available from this window can also be used for batch generation of model classes.
+This is achieved by using SQL wildcards in the table name filter. e.G. 'MY_%' will generate models for all tables whose name begins with 'MY_'. 
 
 ## PO.java patch
 
 Locate the PO.java in your iDempiere installation folder and insert the following function.
 
 ```java
-	/**
-	 * downcast any standard iDempiere model class object into one of a derived custom class
-	 * @param <T> - can be any standard iDempiere model class 
-	 * @param <U> - customized extension of class T 
-	 * @param base - base class object
-	 * @param derived - child class object
-	 *  
-	 * Usage in downcast constructor: 
-	 * 
-	 * Mderived (MBase base) {
-	 *     this(base.getCtx(), 0, base.get_TrxName());
-     *     downcast(base, this);	
-	 * }
-	 *  
-	 */
-	public static <T extends PO, U extends T> U downcast(T base, U derived){
-		PO poBase = (PO)base;
-		PO poDerived = (PO)derived;
+/**
+ * downcast any standard iDempiere model class object into one of a derived custom class
+ * @param <T> - can be any standard iDempiere model class 
+ * @param <U> - customized extension of class T 
+ * @param base - base class object
+ * @param derived - child class object
+ *  
+ * Usage in downcast constructor: 
+ * 
+ * Mderived (MBase base) {
+ *     this(base.getCtx(), 0, base.get_TrxName());
+ *     downcast(base, this);	
+ * }
+ *  
+ */
+public static <T extends PO, U extends T> U downcast(T base, U derived){
+	PO poBase = (PO)base;
+	PO poDerived = (PO)derived;
 
-		poDerived.p_ctx = poBase.p_ctx;
-		poDerived.p_info = poBase.p_info;
-		poDerived.m_oldValues = poBase.m_oldValues;
-		poDerived.m_newValues = poBase.m_newValues;
-		poDerived.m_setErrors = poBase.m_setErrors;
-		poDerived.m_setErrorsFilled = poBase.m_setErrorsFilled;
-		poDerived.m_IDs = poBase.m_IDs;
-		poDerived.m_KeyColumns = poBase.m_KeyColumns;
-		poDerived.m_createNew = poBase.m_createNew;
-		poDerived.m_attachment = poBase.m_attachment;
-		poDerived.m_idOld = poBase.m_idOld;
-		poDerived.m_custom = poBase.m_custom;
-		poDerived.m_attributes = poBase.m_attributes;
-		poDerived.s_acctColumns = poBase.s_acctColumns;
-		poDerived.m_isReplication = poBase.m_isReplication;
-		poDerived.m_isImmutable = poBase.m_isImmutable;
-		poDerived.m_trxName = poBase.m_trxName;
-		poDerived.m_lobInfo = poBase.m_lobInfo;
-		poDerived.m_doc = poBase.m_doc;
-		
-		return derived;
-	}
+	poDerived.p_ctx = poBase.p_ctx;
+	poDerived.p_info = poBase.p_info;
+	poDerived.m_oldValues = poBase.m_oldValues;
+	poDerived.m_newValues = poBase.m_newValues;
+	poDerived.m_setErrors = poBase.m_setErrors;
+	poDerived.m_setErrorsFilled = poBase.m_setErrorsFilled;
+	poDerived.m_IDs = poBase.m_IDs;
+	poDerived.m_KeyColumns = poBase.m_KeyColumns;
+	poDerived.m_createNew = poBase.m_createNew;
+	poDerived.m_attachment = poBase.m_attachment;
+	poDerived.m_idOld = poBase.m_idOld;
+	poDerived.m_custom = poBase.m_custom;
+	poDerived.m_attributes = poBase.m_attributes;
+	poDerived.s_acctColumns = poBase.s_acctColumns;
+	poDerived.m_isReplication = poBase.m_isReplication;
+	poDerived.m_isImmutable = poBase.m_isImmutable;
+	poDerived.m_trxName = poBase.m_trxName;
+	poDerived.m_lobInfo = poBase.m_lobInfo;
+	poDerived.m_doc = poBase.m_doc;
+	
+	return derived;
+}
 ```
