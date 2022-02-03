@@ -30,6 +30,13 @@ public class MModelGenerator extends X_ING_ModelGenerator {
 		super(ctx, rs, trxName);
 	}
 	
+	/**
+	 * produces a MModelgenerator for the given tableID. If none exists it will be created but not saved. 
+	 * The user of the object is responsible for persisting the object if so desired.
+	 * @param tableID
+	 * @param trxName
+	 * @return
+	 */
 	public static MModelGenerator get(int tableID, String trxName) {
 		String sql = "select * from ing_modelgenerator where ing_table_id = ?";
         try (PreparedStatement pstmt = DB.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, trxName)){
@@ -42,20 +49,29 @@ public class MModelGenerator extends X_ING_ModelGenerator {
 	            	return gen;
 	            } 
 	            else {
-	            	MModelGenerator gen = new MModelGenerator(Env.getCtx(), 0, trxName);
-	            	gen.setING_Table_ID(tableID);
-	            	gen.setTableName(MTable.getTableName(Env.getCtx(), tableID));
-	            	String et = MTable.get(tableID).getEntityType();
-	            	gen.setTableEntityTypeFilter(et);
-	            	gen.setPackageName( MEntityType.get(et).getModelPackage() );
-	            	gen.saveEx();
-	            	return gen;
+	            	return getNew(tableID, trxName);
 	            }
         	}
         }
         catch (SQLException e) {
         	throw new DBException(e, sql);
         }
+	}
+
+	/**
+	 * @param tableID
+	 * @param trxName
+	 * @return
+	 */
+	private static MModelGenerator getNew(int tableID, String trxName) {
+		MModelGenerator gen = new MModelGenerator(Env.getCtx(), 0, trxName);
+		gen.setING_Table_ID(tableID);
+		gen.setTableName(MTable.getTableName(Env.getCtx(), tableID));
+		String et = MTable.get(tableID).getEntityType();
+		gen.setTableEntityTypeFilter(et);
+		gen.setPackageName( MEntityType.get(et).getModelPackage() );
+		gen.setFolder(MSysConfig.getValue("Default_Source_Folder"));
+		return gen;
 	}
 	
 	public static int get_ID(int tableID, String trxName) {
@@ -72,11 +88,7 @@ public class MModelGenerator extends X_ING_ModelGenerator {
 	            } 
         	}
 
-        	MModelGenerator gen = new MModelGenerator(Env.getCtx(), 0, trxName);
-        	gen.setING_Table_ID(tableID);
-        	gen.setTableName(MTable.getTableName(Env.getCtx(), tableID));
-        	gen.setPackageName( MEntityType.get(MTable.get(tableID).getEntityType()).getModelPackage() );
-        	gen.setFolder(MSysConfig.getValue("Default_Source_Folder"));
+        	MModelGenerator gen = getNew(tableID, trxName);
         	gen.saveEx();
         	return gen.get_ID();
         }
