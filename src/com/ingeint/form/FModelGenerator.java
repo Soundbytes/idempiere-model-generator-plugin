@@ -1,6 +1,5 @@
 package com.ingeint.form;
 
-import org.adempiere.webui.ClientInfo;
 import org.adempiere.webui.LayoutUtils;
 import org.adempiere.webui.component.Checkbox;
 import org.adempiere.webui.component.Column;
@@ -16,9 +15,7 @@ import org.adempiere.webui.editor.WStringEditor;
 import org.adempiere.webui.editor.WTableDirEditor;
 import org.adempiere.webui.util.ZKUpdateUtil;
 import org.adempiere.webui.window.FDialog;
-import org.compiere.model.GridField;
 import org.compiere.model.MColumn;
-import org.compiere.model.MField;
 import org.compiere.model.MLookup;
 import org.compiere.model.MLookupFactory;
 import org.compiere.model.MTable;
@@ -239,6 +236,9 @@ public class FModelGenerator  extends CustomFormController{
 		baseClassEditor.setValue(gen.getBaseClassPackage());
 		createBaseCB.setChecked(true);
 		createCustomCB.setChecked(false);
+		
+		prefixEditor.setReadWrite(isCoreCB.isChecked());
+		baseClassEditor.setReadWrite(isCoreCB.isChecked());		
 	}
 	
 	@Override
@@ -254,6 +254,7 @@ public class FModelGenerator  extends CustomFormController{
 			try {
 				Trx.run(new TrxRunnable() {
 					public void run(String trxName)	{
+						persist(trxName);
 						generate(trxName);
 					}
 				});
@@ -273,8 +274,7 @@ public class FModelGenerator  extends CustomFormController{
 		}
 	}
 
-	protected void generate(String trxName) {
-		save(trxName);
+	private void generate(String trxName) {
 		if (createBaseCB.isChecked()) {
 			if (!gen.isCoreTable())
 				ModelInterfaceGen.generateSource(gen);
@@ -287,7 +287,7 @@ public class FModelGenerator  extends CustomFormController{
 
 
 
-	protected void save(String trxName) {
+	private void persist(String trxName) {
 		gen.setFolder((String) folderEditor.getValue());
 		gen.setING_Table_ID((int)tableIDEditor.getValue());
 		gen.setTableName(tableIDEditor.getDisplay());
