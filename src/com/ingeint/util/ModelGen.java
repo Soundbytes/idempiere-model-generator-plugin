@@ -101,11 +101,10 @@ public class ModelGen
 	 * @param directory directory
 	 * @param packageName package name
 	 * @param columnEntityTypeFilter entity type filter for columns
-	 * @param mmGen TODO
-	 * @param isBaseClass TODO
+	 * @param mmGen MModelGenerator object
+	 * @param isBaseClass determines whether the generated source is a base class (X_) or a customizable class.
 	 */
-	public ModelGen (int tableID, String directory, String packageName, String columnEntityTypeFilter, MModelGenerator mmGen, boolean isBaseClass)
-	{
+	public ModelGen (int tableID, String directory, String packageName, String columnEntityTypeFilter, MModelGenerator mmGen, boolean isBaseClass) {
 		// get columns
 		boolean hasColumns = getColumns(tableID, columnEntityTypeFilter);
 		if (mmGen.isHasCustomColumns() && !hasColumns)
@@ -982,15 +981,11 @@ public class ModelGen
 	}	//	createKeyNamePair
 
 	
-
+	
 	/**
-	 * @param sourceFolder
-	 * @param packageName
-	 * @param tableEntityType
-	 * @param columnEntityType
-	 * @param mmGen TODO
-	 * @param isBaseClass TODO
-	 * @param tableLike
+	 * 
+	 * @param mmGen
+	 * @param isBaseClass
 	 */
 	public static void generateSource(MModelGenerator mmGen, boolean isBaseClass)
 	{
@@ -1075,8 +1070,8 @@ public class ModelGen
 				StringBuilder token = new StringBuilder().append(tokenizer.nextToken().trim());
 				if (!token.toString().startsWith("'") || !token.toString().endsWith("'"))
 					token = new StringBuilder("'").append(token).append("'");
-				if (token.toString().equals("'D'"))
-					throw new IllegalArgumentException("Core columns can not be processed.");
+//				if (token.toString().equals("'D'"))
+//					throw new IllegalArgumentException("Core columns can not be processed.");
 				if (i > 0)
 					columnFilterBuilder.append(",");
 				columnFilterBuilder.append(token);

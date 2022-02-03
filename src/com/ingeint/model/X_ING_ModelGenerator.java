@@ -27,13 +27,13 @@ import org.compiere.model.X_AD_Table;
 import org.compiere.util.KeyNamePair;
 
 /**
- * Generated Model for ING_ModelGenerator
- * @author iDempiere (generated) 
+ * Generated Model for table ING_ModelGenerator
+ * @author iDempiere (generated)
  * @version Release 8.2 - $Id$
  */
 public class X_ING_ModelGenerator extends PO implements I_ING_ModelGenerator, I_Persistent {
 
-	private static final long serialVersionUID = 20220115L;
+	private static final long serialVersionUID = 20220202L;
 
 	/**
 	 * Standard Constructor
