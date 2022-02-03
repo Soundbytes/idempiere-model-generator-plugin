@@ -67,10 +67,22 @@ public class MModelGenerator extends X_ING_ModelGenerator {
 		MModelGenerator gen = new MModelGenerator(Env.getCtx(), 0, trxName);
 		gen.setING_Table_ID(tableID);
 		gen.setTableName(MTable.getTableName(Env.getCtx(), tableID));
-		String et = MTable.get(tableID).getEntityType();
-		gen.setTableEntityTypeFilter(et);
-		gen.setPackageName( MEntityType.get(et).getModelPackage() );
+		
 		gen.setFolder(MSysConfig.getValue("Default_Source_Folder"));
+
+		String tableET = MTable.get(tableID).getEntityType();
+		String defaultET = MSysConfig.getValue("DEFAULT_ENTITYTYPE");
+		
+		boolean isExtension = !tableET.equals(defaultET);
+		gen.setIsExtension(isExtension);
+		
+		gen.setTableEntityTypeFilter(tableET);
+		gen.setColumnEntityTypeFilter(defaultET);
+		
+		gen.setPackageName( MEntityType.get(defaultET).getModelPackage() );
+		if (isExtension) {
+			gen.setBaseClassPackage( "D".equals(tableET) ? "org.compiere.model" : MEntityType.get(tableET).getModelPackage() );
+		}
 		return gen;
 	}
 	
