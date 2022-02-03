@@ -67,6 +67,9 @@ These two classes must never be edited or customized. Instead you will just recr
 For a new table you might want to also check the *Create Custom Class* box. This will generate a Stub that you can extend with custom functions and data to modify the behavior of the model class.  
 Note: The Model Generator can not be used to overwrite an existing custom class. To do that just delete the existing file before creating the new one. 
 
+Hitting OK will save the generator settings and generate the source code files as specified.
+In the Eclipse Project Explorer click on your project's source folder and select refresh from the context menu to make the changes available to the IDE.
+
 ### Extending an existing model
 
 The Model Generator can also be used to generate child classes of existing (core) models.
@@ -89,13 +92,13 @@ Extended custom model classes have a number of benefits for plug-in developers o
 
 - The model classes are fully integrated into the IDE. No need to memorize column names anymore. Accessing a custom column just feels right now.
 - A customized model can behave differently from the core class. That is at least within your own plugin. Note that any code overrides will not be available to the core. Instead the core will always see only the core model.  
-You can however conveniently downcast a core model that is passed from core to your own version in any of your processes or event handlers. (requires the downcast patch in PO.java)
+You can however conveniently downcast a core model that is passed from core into your own model version in any of your processes or event handlers. (requires the downcast patch in PO.java)
 - Custom models can implement custom interfaces. This is a great feature that simplifies the processing of different table models with shared behavior by the same processing unit.  
 e.G. a shared interface for MYMovement, MYInOut and MYInventory that extracts the functions common to all three classes could be used to implement a processor that manages the storage related related properties of the diverse classes in a unified manner.
  
 
-Notes. Please read carefully: 
-- The generator does not check whether the parent model class actually exists. In that case You will have to modify the dialog settings to create a complete model within your own project. 
+#### Notes. Please read carefully
+- The generator does not check whether the referenced parent model class actually exists. In that case You will have to modify the dialog settings in order to create a complete table model within your own project. 
 - The extended models will not inherit any custom constructors from the core model (That is not possible in java I'm afraid.) Constructors have to be propagated explicitly to the child class. I hope to be able to add this functionality in a future version of the generator. 
 - The downcast constructor can only inherit the state of the PO specific Data structures. Any data fields that are specific to the parent class are initialized when the cast is executed. The current state of those fields in the parent object might be different from the newly downcast object's state. 
 - CAUTION! Model extensions can only be used within your own project. Make sure that your Model factory never ever injects any of your extended classes into the main application. 
