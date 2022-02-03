@@ -33,7 +33,7 @@ import org.compiere.util.KeyNamePair;
  */
 public class X_ING_ModelGenerator extends PO implements I_ING_ModelGenerator, I_Persistent {
 
-	private static final long serialVersionUID = 20220202L;
+	private static final long serialVersionUID = 20220203L;
 
 	/**
 	 * Standard Constructor
@@ -266,20 +266,20 @@ public class X_ING_ModelGenerator extends PO implements I_ING_ModelGenerator, I_
 	}
 
 	/**
-	 * Set Core Table.
-	 * @param IsCoreTable 
-	 * Table is in iDempiereCore (Not a custom Table)
+	 * Set Extension.
+	 * @param IsExtension 
+	 * Model is an extension of an existing (core) class
 	 */
-	public void setIsCoreTable (boolean isCoreTable) {
-		set_Value (COLUMNNAME_IsCoreTable, Boolean.valueOf(isCoreTable));
+	public void setIsExtension (boolean isExtension) {
+		set_Value (COLUMNNAME_IsExtension, Boolean.valueOf(isExtension));
 	}
 
 	/**
-	 * Get Core Table.
-	 * @return Table is in iDempiereCore (Not a custom Table)
+	 * Get Extension.
+	 * @return Model is an extension of an existing (core) class
 	 */
-	public boolean isCoreTable () {
-		Object oo = get_Value(COLUMNNAME_IsCoreTable);
+	public boolean isExtension () {
+		Object oo = get_Value(COLUMNNAME_IsExtension);
 		if (oo != null) 
 		{
 			 if (oo instanceof Boolean) 

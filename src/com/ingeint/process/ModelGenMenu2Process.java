@@ -14,7 +14,7 @@ public class ModelGenMenu2Process extends ModelGenProcess {
 	private String folder;
 	private boolean hasCustomColumns;
 	private int tableID;
-	private boolean isCoreTable;
+	private boolean isExtension;
 	private String packageName;
 	private String tableEntityTypeFilter;
 
@@ -43,8 +43,8 @@ public class ModelGenMenu2Process extends ModelGenProcess {
 			case "AD_Table_ID":
 				tableID = para[i].getParameterAsInt();
 				break;
-			case "IsCoreTable":
-				isCoreTable = "Y".equals(para[i].getParameter());
+			case "IsExtension":
+				isExtension = "Y".equals(para[i].getParameter());
 				break;
 			case "PackageName":
 				packageName = (String)para[i].getParameter();
@@ -62,7 +62,7 @@ public class ModelGenMenu2Process extends ModelGenProcess {
 		m_mgen.setFolder(folder);
 		m_mgen.setHasCustomColumns(hasCustomColumns);
 		m_mgen.setING_Table_ID(tableID);
-		m_mgen.setIsCoreTable(isCoreTable);
+		m_mgen.setIsExtension(isExtension);
 		m_mgen.setPackageName(packageName);
 		m_mgen.setTableEntityTypeFilter(tableEntityTypeFilter);
 		m_mgen.saveEx();

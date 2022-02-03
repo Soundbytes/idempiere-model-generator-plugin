@@ -214,18 +214,18 @@ public interface I_ING_ModelGenerator
 	  */
 	public boolean isActive();
 
-    /** Column name IsCoreTable */
-    public static final String COLUMNNAME_IsCoreTable = "IsCoreTable";
+    /** Column name IsExtension */
+    public static final String COLUMNNAME_IsExtension = "IsExtension";
 
-	/** Set Core Table.
-	  * Table is in iDempiereCore (Not a custom Table)
+	/** Set Extension.
+	  * Model is an extension of an existing (core) class
 	  */
-	public void setIsCoreTable (boolean isCoreTable);
+	public void setIsExtension (boolean isExtension);
 
-	/** Get Core Table.
-	  * Table is in iDempiereCore (Not a custom Table)
+	/** Get Extension.
+	  * Model is an extension of an existing (core) class
 	  */
-	public boolean isCoreTable();
+	public boolean isExtension();
 
     /** Column name ModelGenProcess */
     public static final String COLUMNNAME_ModelGenProcess = "ModelGenProcess";

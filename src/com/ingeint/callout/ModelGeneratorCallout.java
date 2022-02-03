@@ -10,7 +10,7 @@ import com.ingeint.model.MModelGenerator;
 import com.ingeint.util.ModelInterfaceGen;
 
 public class  ModelGeneratorCallout extends CustomCallout {
-	private Boolean m_IsCoreTable = null;
+	private Boolean m_IsExtension = null;
 	
 	@Override
 	protected String start() {
@@ -29,7 +29,7 @@ public class  ModelGeneratorCallout extends CustomCallout {
 			} else {
 				MTable table = new MTable(getCtx(),tableID,null);
 				getTab().setValueSilent(MModelGenerator.COLUMNNAME_TableName, table.getTableName());
-				if(isCoreTable()) {
+				if(isExtension()) {
 					String packageName = ModelInterfaceGen.getModelPackage(table.getEntityType());
 					getTab().setValue(MModelGenerator.COLUMNNAME_BaseClassPackage, packageName);
 				}
@@ -44,8 +44,8 @@ public class  ModelGeneratorCallout extends CustomCallout {
 				startTableName(tableName);
 			}
 			break;
-		case MModelGenerator.COLUMNNAME_IsCoreTable:
-			if (!isCoreTable()) {
+		case MModelGenerator.COLUMNNAME_IsExtension:
+			if (!isExtension()) {
 				getTab().setValue(MModelGenerator.COLUMNNAME_BaseClassPackage, null);
 				break;
 			}
@@ -66,7 +66,7 @@ public class  ModelGeneratorCallout extends CustomCallout {
 	private void startTableID(Integer tableID) {
 		MTable table = new MTable(getCtx(),tableID,null);
 		getTab().setValueSilent(MModelGenerator.COLUMNNAME_TableName, table.getTableName());
-		if(isCoreTable()) {
+		if(isExtension()) {
 			String packageName = ModelInterfaceGen.getModelPackage(table.getEntityType());
 			getTab().setValue(MModelGenerator.COLUMNNAME_BaseClassPackage, packageName);
 		}		
@@ -77,12 +77,12 @@ public class  ModelGeneratorCallout extends CustomCallout {
 		KeyNamePair[] list = DB.getKeyNamePairs(sql, false, tableName);
 		if (list.length == 1) {
 			getTab().setValueSilent(MModelGenerator.COLUMNNAME_ING_Table_ID, list[0].getKey());
-			if(isCoreTable())
+			if(isExtension())
 				getTab().setValue(MModelGenerator.COLUMNNAME_BaseClassPackage, 
 						ModelInterfaceGen.getModelPackage(list[0].getName()));
 		} else if (list.length > 1) {
 			getTab().setValue(MModelGenerator.COLUMNNAME_ING_Table_ID, null);
-			if(isCoreTable()) {
+			if(isExtension()) {
 				String entitytype = list[0].getName();
 				for (int i = 1; i<list.length;++i) {
 					if (!entitytype.equals(list[i].getName())) {
@@ -98,10 +98,10 @@ public class  ModelGeneratorCallout extends CustomCallout {
 	}
 	
 	
-	private boolean isCoreTable() {
-		if (m_IsCoreTable == null)
-			m_IsCoreTable = getTab().getValueAsBoolean(MModelGenerator.COLUMNNAME_IsCoreTable);
-		return m_IsCoreTable;
+	private boolean isExtension() {
+		if (m_IsExtension == null)
+			m_IsExtension = getTab().getValueAsBoolean(MModelGenerator.COLUMNNAME_IsExtension);
+		return m_IsExtension;
 	}
 
 }

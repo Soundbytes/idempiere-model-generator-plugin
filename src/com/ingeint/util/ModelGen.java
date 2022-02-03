@@ -265,11 +265,11 @@ public class ModelGen
 		String prefixBase;
 		String prefixDerived;
 		String baseClassPackage;
-		if (m_mmGen.isCoreTable()) {
+		if (m_mmGen.isExtension()) {
 			if (m_mmGen.getCustomPrefix() == null || Util.isEmpty(m_mmGen.getCustomPrefix())) 
-				throw new IllegalArgumentException("Custom Prefix required for Core Table");
+				throw new IllegalArgumentException("Custom Prefix required for Table Extension");
 			if (m_mmGen.getBaseClassPackage() == null || Util.isEmpty(m_mmGen.getBaseClassPackage())) 
-				throw new IllegalArgumentException("Base Class Name required for Core Table");
+				throw new IllegalArgumentException("Base Class Package required for Table Extension");
 
 			
 			prefixBase = new StringBuilder("X").append(m_mmGen.getCustomPrefix()).append("_").toString();
@@ -317,7 +317,7 @@ public class ModelGen
 		
 		if (m_isBaseClass) {
 			className = new StringBuilder(prefixBase).append(tableName);
-			if (m_mmGen.isCoreTable()) {
+			if (m_mmGen.isExtension()) {
 				baseClassName =  new StringBuilder("M").append(getTrunk(tableName));
 				addImportClass(baseClassPackage + "." + baseClassName);
 			} else {
@@ -326,7 +326,7 @@ public class ModelGen
 			}
 		} else {
 			className = new StringBuilder(prefixDerived).append(getTrunk(tableName));
-			baseClassName = new StringBuilder(m_mmGen.isCoreTable() ? prefixBase : "X_").append(tableName);
+			baseClassName = new StringBuilder(m_mmGen.isExtension() ? prefixBase : "X_").append(tableName);
 		}
 			
 		//
@@ -354,7 +354,7 @@ public class ModelGen
 			.append("public class ").append(className)
 		 	.append(" extends ")
 		 	.append(baseClassName);
-		if (m_isBaseClass && !m_mmGen.isCoreTable()) { 	
+		if (m_isBaseClass && !m_mmGen.isExtension()) { 	
 			startBottom.append(" implements I_").append(tableName)
 			 	.append(", I_Persistent ");
 			addImportClass("org.compiere.model.I_Persistent");
@@ -395,7 +395,7 @@ public class ModelGen
 		
 			//	Load Constructor End
 		// Downcast Constructor
-		if (m_mmGen.isCoreTable()) {
+		if (m_mmGen.isExtension()) {
 			startBottom.append(NL)
 				.append("\t/**").append(NL)
 				.append("\t * Downcast Constructor").append(NL)
@@ -423,7 +423,7 @@ public class ModelGen
 //			 .append(NL)
 //			 .append("    protected static KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);").append(NL)
 
-		if(m_isBaseClass && !m_mmGen.isCoreTable()) {
+		if(m_isBaseClass && !m_mmGen.isExtension()) {
 			// accessLevel
 			StringBuilder accessLevelInfo = new StringBuilder().append(accessLevel).append(" ");
 			if (accessLevel >= 4 )
@@ -563,7 +563,7 @@ public class ModelGen
 		boolean isKeyNamePairCreated = false; // true if the method "getKeyNamePair" is already generated
 
 		for (ColumnData cd : m_columnData)	{
-			if(m_mmGen.isCoreTable() && m_isBaseClass) {
+			if(m_mmGen.isExtension() && m_isBaseClass) {
 				// Create COLUMNNAME_ property 
 				sb.append(NL)
 				  		.append("    /** Column name ").append(cd.columnName).append(" */")

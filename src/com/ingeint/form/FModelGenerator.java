@@ -67,8 +67,8 @@ public class FModelGenerator  extends CustomFormController{
 	protected Label packageLabel;
 	protected WStringEditor packageEditor;
 
-	protected Label isCoreLabel;
-	protected Checkbox isCoreCB;
+	protected Label isExtensionLabel;
+	protected Checkbox isExtensionCB;
 	
 	protected Label prefixLabel;
 	protected WStringEditor prefixEditor;
@@ -107,9 +107,9 @@ public class FModelGenerator  extends CustomFormController{
 		packageEditor = new WStringEditor();
 		packageEditor.getComponent().setWidth("100%");
 	
-		isCoreLabel = new Label(Msg.getElement(Env.getCtx(), "IsCoreTable", false));
-		isCoreCB = new Checkbox();
-		isCoreCB.addActionListener(this);
+		isExtensionLabel = new Label(Msg.getElement(Env.getCtx(), "IsExtension", false));
+		isExtensionCB = new Checkbox();
+		isExtensionCB.addActionListener(this);
 		
 		prefixLabel = new Label(Msg.getElement(Env.getCtx(), "CustomPrefix", false));
 		prefixEditor = new WStringEditor();
@@ -207,8 +207,8 @@ public class FModelGenerator  extends CustomFormController{
 		row.appendChild(tableEntityTypeLabel.rightAlign());
 		row.appendChild(tableEntityTypeEditor.getComponent());
 		row = rows.newRow();
-		row.appendChild(isCoreLabel.rightAlign());
-		row.appendChild(isCoreCB);
+		row.appendChild(isExtensionLabel.rightAlign());
+		row.appendChild(isExtensionCB);
 		row = rows.newRow();
 		row.appendChild(prefixLabel.rightAlign());
 		row.appendChild(prefixEditor.getComponent());
@@ -231,14 +231,16 @@ public class FModelGenerator  extends CustomFormController{
 		packageEditor.setValue(gen.getPackageName());
 		colEntityTypeEditor.setValue(gen.getColumnEntityTypeFilter());
 		tableEntityTypeEditor.setValue(gen.getTableEntityTypeFilter());
-		isCoreCB.setChecked(gen.isCoreTable());
+		isExtensionCB.setChecked(gen.isExtension());
 		prefixEditor.setValue(gen.getCustomPrefix());
 		baseClassEditor.setValue(gen.getBaseClassPackage());
 		createBaseCB.setChecked(true);
 		createCustomCB.setChecked(false);
 		
-		prefixEditor.setReadWrite(isCoreCB.isChecked());
-		baseClassEditor.setReadWrite(isCoreCB.isChecked());		
+		prefixEditor.setReadWrite(isExtensionCB.isChecked());
+		prefixEditor.setMandatory(isExtensionCB.isChecked());
+		baseClassEditor.setReadWrite(isExtensionCB.isChecked());
+		baseClassEditor.setMandatory(isExtensionCB.isChecked());
 	}
 	
 	@Override
@@ -268,15 +270,15 @@ public class FModelGenerator  extends CustomFormController{
 		else if (e.getTarget().getId().equals(ConfirmPanel.A_CANCEL)) {
 			getForm().dispose();
 		}
-		else if (e.getTarget().equals(isCoreCB)) {
-			prefixEditor.setReadWrite(isCoreCB.isChecked());
-			baseClassEditor.setReadWrite(isCoreCB.isChecked());
+		else if (e.getTarget().equals(isExtensionCB)) {
+			prefixEditor.setReadWrite(isExtensionCB.isChecked());
+			baseClassEditor.setReadWrite(isExtensionCB.isChecked());
 		}
 	}
 
 	private void generate(String trxName) {
 		if (createBaseCB.isChecked()) {
-			if (!gen.isCoreTable())
+			if (!gen.isExtension())
 				ModelInterfaceGen.generateSource(gen);
 			ModelGen.generateSource(gen, true);	
 		}
@@ -294,7 +296,7 @@ public class FModelGenerator  extends CustomFormController{
 		gen.setPackageName((String) packageEditor.getValue());
 		gen.setColumnEntityTypeFilter((String) colEntityTypeEditor.getValue());
 		gen.setTableEntityTypeFilter((String) tableEntityTypeEditor.getValue());
-		gen.setIsCoreTable(isCoreCB.isChecked());
+		gen.setIsExtension(isExtensionCB.isChecked());
 		gen.setCustomPrefix((String) prefixEditor.getValue());
 		gen.setBaseClassPackage((String) baseClassEditor.getValue());
 		gen.saveEx();
