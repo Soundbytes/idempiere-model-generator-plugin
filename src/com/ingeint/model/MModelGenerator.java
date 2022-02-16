@@ -34,28 +34,34 @@ public class MModelGenerator extends X_ING_ModelGenerator {
 	 * produces a MModelgenerator for the given tableID. If none exists it will be created but not saved. 
 	 * The user of the object is responsible for persisting the object if so desired.
 	 * @param tableID
+	 * @param getNew - if true ignores existing DB entries and initializes mmgen from system settings.
 	 * @param trxName
 	 * @return
 	 */
-	public static MModelGenerator get(int tableID, String trxName) {
-		String sql = "select * from ing_modelgenerator where ing_table_id = ?";
-        try (PreparedStatement pstmt = DB.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, trxName)){
-        	pstmt.setInt(1, tableID);
-        	try(ResultSet rs = pstmt.executeQuery()) {
-	            if (rs.next()) {
-	            	MModelGenerator gen = new MModelGenerator(Env.getCtx(), rs, trxName);
-	            	if (rs.next())
-	            		gen.log.warning("found more than one item for tableID " + tableID);
-	            	return gen;
-	            } 
-	            else {
-	            	return getNew(tableID, trxName);
-	            }
-        	}
-        }
-        catch (SQLException e) {
-        	throw new DBException(e, sql);
-        }
+	public static MModelGenerator get(int tableID, boolean getNew, String trxName) {
+		MModelGenerator gen;
+		if (getNew)
+			gen = getNew(tableID, trxName);
+		else {
+			String sql = "select * from ing_modelgenerator where ing_table_id = ?";
+	        try (PreparedStatement pstmt = DB.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, trxName)){
+	        	pstmt.setInt(1, tableID);
+	        	try(ResultSet rs = pstmt.executeQuery()) {
+		            if (rs.next()) {
+		            	gen = new MModelGenerator(Env.getCtx(), rs, trxName);
+		            	if (rs.next())
+		            		gen.log.warning("found more than one item for tableID " + tableID);
+		            } 
+		            else {
+		            	gen = getNew(tableID, trxName);
+		            }
+	        	}
+	        }
+	        catch (SQLException e) {
+	        	throw new DBException(e, sql);
+	        }
+		}
+    	return gen;
 	}
 
 	/**

@@ -82,6 +82,8 @@ public class FModelGenerator  extends CustomFormController{
 	protected Label createCustomLabel;
 	protected Checkbox createCustomCB;
 
+	private int tableID;
+
 	@Override
 	public void buildForm() throws Exception {
 		contentPane = new Borderlayout();
@@ -224,8 +226,6 @@ public class FModelGenerator  extends CustomFormController{
 	}	
 	
 	private void fillForm() {
-		int table_ID = getForm().getGridTab().getRecord_ID();
-		gen = MModelGenerator.get(table_ID, null);
 		folderEditor.setValue(gen.getFolder());
 		tableIDEditor.setValue(gen.getING_Table_ID());
 		packageEditor.setValue(gen.getPackageName());
@@ -245,6 +245,8 @@ public class FModelGenerator  extends CustomFormController{
 	
 	@Override
 	protected void initForm() {
+		tableID = getForm().getGridTab().getRecord_ID();
+		gen = MModelGenerator.get(tableID, false, null);
 		fillForm();
 	}
 	
@@ -270,6 +272,11 @@ public class FModelGenerator  extends CustomFormController{
 		else if (e.getTarget().getId().equals(ConfirmPanel.A_CANCEL)) {
 			getForm().dispose();
 		}
+		//  Refresh
+		else if (e.getTarget().getId().equals(ConfirmPanel.A_REFRESH)) {
+			gen = MModelGenerator.get(tableID, true, null);
+			fillForm();
+		}
 		else if (e.getTarget().equals(isExtensionCB)) {
 			prefixEditor.setReadWrite(isExtensionCB.isChecked());
 			baseClassEditor.setReadWrite(isExtensionCB.isChecked());
@@ -291,8 +298,8 @@ public class FModelGenerator  extends CustomFormController{
 
 	private void persist(String trxName) {
 		gen.setFolder((String) folderEditor.getValue());
-		gen.setING_Table_ID((int)tableIDEditor.getValue());
-		gen.setTableName(tableIDEditor.getDisplay());
+		gen.setING_Table_ID(tableID);
+		gen.setTableName(MTable.getTableName(Env.getCtx(), tableID));
 		gen.setPackageName((String) packageEditor.getValue());
 		gen.setColumnEntityTypeFilter((String) colEntityTypeEditor.getValue());
 		gen.setTableEntityTypeFilter((String) tableEntityTypeEditor.getValue());

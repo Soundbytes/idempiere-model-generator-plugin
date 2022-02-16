@@ -20,7 +20,7 @@ public class ModelGenMenu2Process extends ModelGenProcess {
 
 	@Override
 	protected void prepare() {
-		m_mgen = MModelGenerator.get(getRecord_ID(), get_TrxName());
+		m_mgen = MModelGenerator.get(getRecord_ID(), false, get_TrxName());
 		ProcessInfoParameter[] para = getParameter();
 		for (int i = 0; i < para.length; i++) {
 			String name = para[i].getParameterName();

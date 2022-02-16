@@ -11,7 +11,7 @@ import com.ingeint.util.ModelInterfaceGen;
 public class ModelGenMenuProcess extends ModelGenProcess {
 	
 	public ModelGenMenuProcess() {
-		m_mgen = MModelGenerator.get(getRecord_ID(), get_TrxName());
+		m_mgen = MModelGenerator.get(getRecord_ID(), false, get_TrxName());
 	}
 
 
