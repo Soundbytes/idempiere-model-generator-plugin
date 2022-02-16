@@ -107,8 +107,10 @@ public class ModelGen
 	public ModelGen (int tableID, String directory, String packageName, String columnEntityTypeFilter, MModelGenerator mmGen, boolean isBaseClass) {
 		// get columns
 		boolean hasColumns = getColumns(tableID, columnEntityTypeFilter);
-		if (mmGen.isHasCustomColumns() && !hasColumns)
+		if (mmGen.isHasCustomColumns() && !hasColumns) {
+			log.warning("No custom Columns found. Model Generator will not create a source code file for table " + mmGen.getTableName());
 			return;
+		}
 		
 		// add Base Class to Imports
 		m_mmGen = mmGen;
@@ -213,6 +215,8 @@ public class ModelGen
 
 	private ColumnData[] m_columnData;
 
+	private String tableName;
+
 //	private String m_baseClassPackage;
 	/**
 	 * Add class name to class import list
@@ -281,7 +285,6 @@ public class ModelGen
 			baseClassPackage = null;
 		}
 		
-		String tableName = "";
 		int accessLevel = 0;
 		String sql = "SELECT TableName, AccessLevel FROM AD_Table WHERE AD_Table_ID=?";
 		PreparedStatement pstmt = null;
@@ -313,20 +316,22 @@ public class ModelGen
 		//
 		StringBuilder keyColumn = new StringBuilder().append(tableName).append("_ID");
 		StringBuilder className;
-		StringBuilder baseClassName;
+		StringBuilder baseClassShortName;
 		
 		if (m_isBaseClass) {
 			className = new StringBuilder(prefixBase).append(tableName);
 			if (m_mmGen.isExtension()) {
-				baseClassName =  new StringBuilder("M").append(getTrunk(tableName));
-				addImportClass(baseClassPackage + "." + baseClassName);
+				baseClassShortName =  new StringBuilder("M").append(getTrunk(tableName));
+				addImportClass(baseClassPackage + "." + baseClassShortName);
+				ConstructorInfo ci = ConstructorInfo.get(baseClassPackage + "." + baseClassShortName);
+				log.warning(ci.toString());
 			} else {
-				baseClassName =  new StringBuilder("PO");
+				baseClassShortName =  new StringBuilder("PO");
 				this.addImportClass("org.compiere.model.PO");
 			}
 		} else {
 			className = new StringBuilder(prefixDerived).append(getTrunk(tableName));
-			baseClassName = new StringBuilder(m_mmGen.isExtension() ? prefixBase : "X_").append(tableName);
+			baseClassShortName = new StringBuilder(m_mmGen.isExtension() ? prefixBase : "X_").append(tableName);
 		}
 			
 		//
@@ -353,11 +358,22 @@ public class ModelGen
 			.append(" */").append(NL)
 			.append("public class ").append(className)
 		 	.append(" extends ")
-		 	.append(baseClassName);
-		if (m_isBaseClass && !m_mmGen.isExtension()) { 	
-			startBottom.append(" implements I_").append(tableName)
-			 	.append(", I_Persistent ");
-			addImportClass("org.compiere.model.I_Persistent");
+		 	.append(baseClassShortName);
+		if (m_mmGen.isExtension()) {
+			if(!m_isBaseClass) {
+				startBottom.append(" ");
+				
+				// Imports for Closer embedded class (at the bottom of the file)
+				addImportClass(baseClassPackage + ".X_" + tableName);
+				addImportClass("java.io.Closeable");
+			}
+		}
+		else {
+			if(m_isBaseClass) {
+				startBottom.append(" implements I_").append(tableName)
+				 	.append(", I_Persistent ");
+				addImportClass("org.compiere.model.I_Persistent");
+			}
 		}
 		startBottom.append("{").append(NL)
 
@@ -394,18 +410,7 @@ public class ModelGen
 			 .append("\t}").append(NL);
 		
 			//	Load Constructor End
-		// Downcast Constructor
-		if (m_mmGen.isExtension()) {
-			startBottom.append(NL)
-				.append("\t/**").append(NL)
-				.append("\t * Downcast Constructor").append(NL)
-				.append("\t */").append(NL)
-				.append("\tpublic ").append(className).append(" (X_").append(tableName).append(" base) {").append(NL)
-				.append("\t\tsuper (base.getCtx(), 0, base.get_TrxName());").append(NL)
-				.append("\t\tdowncast(base, this);").append(NL)
-				.append("\t}").append(NL);
-			addImportClass(baseClassPackage + ".X_" + tableName);
-		} // Downcast Constructor End
+
 		
 		// TODO Add all constructors present in M-class if core table
 
@@ -445,13 +450,13 @@ public class ModelGen
 				.append("\t}").append(NL);
 			// initPO
 			startBottom.append(NL)
-				 .append("\t/**").append(NL)
-				 .append("\t * Load Meta Data").append(NL)
-				 .append("\t */").append(NL)
-				 .append("\tprotected POInfo initPO (Properties ctx) {").append(NL)
-				 .append("\t\tPOInfo poi = POInfo.getPOInfo (ctx, Table_ID, get_TrxName());").append(NL)
-				 .append("\t\treturn poi;").append(NL)
-				 .append("\t}").append(NL);
+				.append("\t/**").append(NL)
+				.append("\t * Load Meta Data").append(NL)
+				.append("\t */").append(NL)
+				.append("\tprotected POInfo initPO (Properties ctx) {").append(NL)
+				.append("\t\tPOInfo poi = POInfo.getPOInfo (ctx, Table_ID, get_TrxName());").append(NL)
+				.append("\t\treturn poi;").append(NL)
+				.append("\t}").append(NL);
 			addImportClass("org.compiere.model.POInfo");
 				// initPO
 	
@@ -459,27 +464,47 @@ public class ModelGen
 			boolean hasName = (DB.getSQLValue(null, sqlCol, AD_Table_ID, "Name") == 1);
 				// toString()
 			startBottom.append(NL)
-				 .append("\tpublic String toString() {").append(NL)
-				 .append("\t\tStringBuilder sb = new StringBuilder (\"").append(className).append("[\")").append(NL)
-				 .append("\t\t\t.append(get_ID())");
+				.append("\tpublic String toString() {").append(NL)
+				.append("\t\tStringBuilder sb = new StringBuilder (\"").append(className).append("[\")").append(NL)
+				.append("\t\t\t.append(get_ID())");
 			if (hasName)
 				startBottom.append(".append(\",Name=\").append(getName())");
 			startBottom.append(".append(\"]\");").append(NL)
-				 .append("\t\treturn sb.toString();").append(NL)
-				 .append("\t}").append(NL);
+				.append("\t\treturn sb.toString();").append(NL)
+				.append("\t}").append(NL);
 		}
 
 		createImports(start);
 		start.append(startBottom);
+		
 
-		String end = "}";
+		StringBuilder end = new StringBuilder();
+		if (!m_isBaseClass && m_mmGen.isExtension()) {
+			end.append(NL)
+					.append("\tpublic static class Closer extends ").append(className).append(" implements Closeable {").append(NL)
+					// serialVersionUID
+					.append(NL)
+					.append("\t\tprivate static final long serialVersionUID = ")
+					.append(String.format("%1$tY%1$tm%1$td", new Timestamp(System.currentTimeMillis())))
+				 	.append("L;").append(NL)
+				 	// Shallow Copy Constructor
+					.append(NL)
+					.append("\t\t/**").append(NL)
+					.append("\t\t * Shallow Copy Constructor").append(NL)
+					.append("\t\t */").append(NL)
+					.append("\t\tpublic Closer (X_").append(tableName).append(" base) {").append(NL)
+					.append("\t\t\tsuper (base.getCtx(), 0, base.get_TrxName());").append(NL)
+					.append("\t\t\tshallowCopy(base, this);").append(NL)
+					.append("\t\t}").append(NL)
+					.append("\t}").append(NL);
+		}
+		end.append("}");
 		//
 		sb.insert(0, start);
 		sb.append(end);
 
 		return className.toString();
 	}
-
 
 	public static String getTrunk(String tableName) {
 		return getTrunk (tableName, false); 
@@ -1113,21 +1138,21 @@ public class ModelGen
 		});		
 	}	
 	
-	private String getSerialVersionUID(String fileName) {
-		File file = new File(fileName);
-
-		try (Scanner scanner = new Scanner(file)){
-		    while (scanner.hasNextLine()) {
-		        String line = scanner.nextLine();
-		        if(line.startsWith("\tprivate static final long serialVersionUID = ")) { 
-		            return line;
-		        }
-		    }
-		} catch(FileNotFoundException e) { 
-		   throw new AdempiereException(e); 
-		}
-		return null;
-	}
+//	private String getSerialVersionUID(String fileName) {
+//		File file = new File(fileName);
+//
+//		try (Scanner scanner = new Scanner(file)){
+//		    while (scanner.hasNextLine()) {
+//		        String line = scanner.nextLine();
+//		        if(line.startsWith("\tprivate static final long serialVersionUID = ")) { 
+//		            return line;
+//		        }
+//		    }
+//		} catch(FileNotFoundException e) { 
+//		   throw new AdempiereException(e); 
+//		}
+//		return null;
+//	}
 	
 	class ColumnData {
 		public String columnName;
