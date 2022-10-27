@@ -36,12 +36,10 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Scanner;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 import java.util.logging.Level;
 
-import org.adempiere.exceptions.AdempiereException;
 import org.adempiere.exceptions.DBException;
 import org.adempiere.webui.apps.AEnv;
 import org.adempiere.webui.component.Messagebox;
@@ -94,20 +92,23 @@ public class ModelGen
 	protected String packageName = "";
 
 	private boolean m_isBaseClass;
+	private boolean m_useCache;
 	
 	/**
 	 * Generate PO Class
 	 * @param tableID table id
+	 * @param isView TODO
 	 * @param directory directory
 	 * @param packageName package name
 	 * @param columnEntityTypeFilter entity type filter for columns
 	 * @param mmGen MModelGenerator object
 	 * @param isBaseClass determines whether the generated source is a base class (X_) or a customizable class.
+	 * @param useCache TODO
 	 */
-	public ModelGen (int tableID, String directory, String packageName, String columnEntityTypeFilter, MModelGenerator mmGen, boolean isBaseClass) {
+	private ModelGen (int tableID, boolean isView, String directory, String packageName, String columnEntityTypeFilter, 
+			MModelGenerator mmGen, boolean isBaseClass, boolean useCache) {
 		// get columns
-		boolean hasColumns = getColumns(tableID, columnEntityTypeFilter);
-		if (mmGen.isHasCustomColumns() && !hasColumns) {
+		if (!getColumns(tableID, columnEntityTypeFilter) && mmGen.isHasCustomColumns()) {
 			log.warning("No custom Columns found. Model Generator will not create a source code file for table " + mmGen.getTableName());
 			return;
 		}
@@ -115,14 +116,15 @@ public class ModelGen
 		// add Base Class to Imports
 		m_mmGen = mmGen;
 		m_isBaseClass = isBaseClass;
+		m_useCache = !isBaseClass && useCache;
 		this.packageName = packageName;
 		
 		//	create column access methods
 		StringBuilder mandatory = new StringBuilder();
 		StringBuilder sb = isBaseClass 
-				? createColumns(tableID, mandatory) 
+				? createColumns(tableID, isView, mandatory) 
 				: new StringBuilder("");
-
+		
 		// Header
 		String className = createHeader(tableID, sb, mandatory, packageName);
 
@@ -325,13 +327,17 @@ public class ModelGen
 				addImportClass(baseClassPackage + "." + baseClassShortName);
 				ConstructorInfo ci = ConstructorInfo.get(baseClassPackage + "." + baseClassShortName);
 				log.warning(ci.toString());
+				ci.getParameters();
+				ci.getImports();
 			} else {
 				baseClassShortName =  new StringBuilder("PO");
-				this.addImportClass("org.compiere.model.PO");
+				addImportClass("org.compiere.model.PO");
 			}
 		} else {
 			className = new StringBuilder(prefixDerived).append(getTrunk(tableName));
 			baseClassShortName = new StringBuilder(m_mmGen.isExtension() ? prefixBase : "X_").append(tableName);
+			if(m_useCache)
+				addImportClass("group.ecofuels.utils.POCache");
 		}
 			
 		//
@@ -346,7 +352,6 @@ public class ModelGen
 		addImportClass(java.sql.ResultSet.class);
 	//	if (!packageName.equals("org.compiere.model"))
 	//		addImportClass("org.compiere.model.*");
-
 		
 		StringBuilder startBottom = new StringBuilder();
 		
@@ -397,7 +402,10 @@ public class ModelGen
 				.append(mandatory) //.append(NL)
 				.append("\t\t} */").append(NL);
 		}
-		startBottom.append("    }").append(NL)
+		if (m_useCache)
+			startBottom.append("\t\tif(").append(keyColumn).append(" > 1)").append(NL)
+				.append("\t\t\tPOCache.put(this);").append(NL);
+		startBottom.append("\t}").append(NL)
 			//	Constructor End
 
 			//	Load Constructor
@@ -406,8 +414,10 @@ public class ModelGen
 			 .append("\t * Load Constructor").append(NL)
 			 .append("\t */").append(NL)
 			 .append("\tpublic ").append(className).append(" (Properties ctx, ResultSet rs, String trxName) {").append(NL)
-			 .append("\t\tsuper (ctx, rs, trxName);").append(NL)
-			 .append("\t}").append(NL);
+			 .append("\t\tsuper (ctx, rs, trxName);").append(NL);
+		if (m_useCache)
+			startBottom.append("\t\tPOCache.put(this);").append(NL);
+		startBottom.append("\t}").append(NL);
 		
 			//	Load Constructor End
 
@@ -445,6 +455,7 @@ public class ModelGen
 				.append("\t * AccessLevel").append(NL)
 				.append("\t * @return ").append(accessLevelInfo).append(NL)
 				.append("\t */").append(NL)
+				.append(getOverrideAnnotation())
 				.append("\tprotected int get_AccessLevel() {").append(NL)
 				.append("\t\treturn accessLevel.intValue();").append(NL)
 				.append("\t}").append(NL);
@@ -453,6 +464,7 @@ public class ModelGen
 				.append("\t/**").append(NL)
 				.append("\t * Load Meta Data").append(NL)
 				.append("\t */").append(NL)
+				.append(getOverrideAnnotation())
 				.append("\tprotected POInfo initPO (Properties ctx) {").append(NL)
 				.append("\t\tPOInfo poi = POInfo.getPOInfo (ctx, Table_ID, get_TrxName());").append(NL)
 				.append("\t\treturn poi;").append(NL)
@@ -464,6 +476,7 @@ public class ModelGen
 			boolean hasName = (DB.getSQLValue(null, sqlCol, AD_Table_ID, "Name") == 1);
 				// toString()
 			startBottom.append(NL)
+				.append(getOverrideAnnotation())
 				.append("\tpublic String toString() {").append(NL)
 				.append("\t\tStringBuilder sb = new StringBuilder (\"").append(className).append("[\")").append(NL)
 				.append("\t\t\t.append(get_ID())");
@@ -473,6 +486,29 @@ public class ModelGen
 				.append("\t\treturn sb.toString();").append(NL)
 				.append("\t}").append(NL);
 		}
+		else if(m_useCache) {
+			startBottom.append(NL)
+			.append(getOverrideAnnotation())
+			.append("\tpublic boolean save() {").append(NL)
+			.append("\t\tPOCache.put(this);").append(NL)
+			.append("\t\treturn super.save();").append(NL)
+			.append("\t}").append(NL)
+			.append(NL)
+			.append("\tpublic static ").append(className).append(" get(Properties ctx, int ").append(keyColumn).append(", String trxName) {").append(NL)
+			.append("\t\t").append(className).append(" retVal = POCache.get(\"").append(className).append("\", ").append(keyColumn).append(", trxName);").append(NL)
+			.append("\t\tif (retVal == null)").append(NL)
+			.append("\t\t\tretVal = new ").append(className).append(" (ctx, ").append(keyColumn).append(", trxName);").append(NL)
+			.append("\t\treturn retVal;").append(NL)
+			.append("\t}").append(NL);
+		}
+		
+		//
+		// TODO: For views: Throw an Exception when saving or deleting 
+		// of the record is attempted. 
+		// generate Overrides of any public Base class functions 
+		// related to saving or deleting the DB record  
+		// i.e PO.save(), PO.delete(), ...
+		//
 
 		createImports(start);
 		start.append(startBottom);
@@ -494,8 +530,10 @@ public class ModelGen
 					.append("\t\t */").append(NL)
 					.append("\t\tpublic Closer (X_").append(tableName).append(" base) {").append(NL)
 					.append("\t\t\tsuper (base.getCtx(), 0, base.get_TrxName());").append(NL)
-					.append("\t\t\tshallowCopy(base, this);").append(NL)
-					.append("\t\t}").append(NL)
+					.append("\t\t\tshallowCopy(base, this);").append(NL);
+			if(m_useCache) 
+				end.append("\t\t\tPOCache.put(this);").append(NL);
+			end.append("\t\t}").append(NL)
 					.append("\t}").append(NL);
 		}
 		end.append("}");
@@ -579,66 +617,70 @@ public class ModelGen
 	/**
 	 * 	Create Column access methods
 	 * 	@param AD_Table_ID table
-	 * 	@param mandatory init call for mandatory columns
+	 * @param isView TODO
+	 * @param mandatory init call for mandatory columns
 	 * 	@return set/get method
 	 */
-	protected StringBuilder createColumns (int AD_Table_ID, StringBuilder mandatory)
+	protected StringBuilder createColumns (int AD_Table_ID, boolean isView, StringBuilder mandatory)
 	{
 		StringBuilder sb = new StringBuilder();
-		boolean isKeyNamePairCreated = false; // true if the method "getKeyNamePair" is already generated
 
-		for (ColumnData cd : m_columnData)	{
-			if(m_mmGen.isExtension() && m_isBaseClass) {
-				// Create COLUMNNAME_ property 
-				sb.append(NL)
-				  		.append("    /** Column name ").append(cd.columnName).append(" */")
-				  		.append(NL)
-				  		.append("    public static final String COLUMNNAME_").append(cd.columnName)
-				  		.append(" = \"").append(cd.columnName).append("\";")
-				  		.append(NL);
+		if(m_columnData != null) {
+			boolean isKeyNamePairCreated = false; // true if the method "getKeyNamePair" is already generated
+			for (ColumnData cd : m_columnData)	{
+				if(m_mmGen.isExtension() && m_isBaseClass) {
+					// Create COLUMNNAME_ property 
+					sb.append(NL)
+					  		.append("    /** Column name ").append(cd.columnName).append(" */")
+					  		.append(NL)
+					  		.append("    public static final String COLUMNNAME_").append(cd.columnName)
+					  		.append(" = \"").append(cd.columnName).append("\";")
+					  		.append(NL);
+					//
+				}
+				sb.append(
+					createColumnMethods (AD_Table_ID, isView, cd, mandatory)
+				);
 				//
-			}
-			sb.append(
-				createColumnMethods (mandatory, cd, AD_Table_ID)
-			);
-			//
-			if (cd.seqNo == 1 && cd.IsIdentifier) {
-				if (!isKeyNamePairCreated) {
-					sb.append(createKeyNamePair(cd.columnName, cd.displayType));
-					isKeyNamePairCreated = true;
-				}
-				else {
-					
-					StringBuilder msgException = new StringBuilder("More than one primary identifier found ")
-								.append(" (AD_Table_ID=").append(AD_Table_ID).append(", ColumnName=").append(cd.columnName).append(")");						
-					throw new RuntimeException(msgException.toString());
+				if (cd.seqNo == 1 && cd.IsIdentifier) {
+					if (!isKeyNamePairCreated) {
+						sb.append(createKeyNamePair(cd.columnName, cd.displayType));
+						isKeyNamePairCreated = true;
+					}
+					else {
+						
+						StringBuilder msgException = new StringBuilder("More than one primary identifier found ")
+									.append(" (AD_Table_ID=").append(AD_Table_ID).append(", ColumnName=").append(cd.columnName).append(")");						
+						throw new RuntimeException(msgException.toString());
+					}
 				}
 			}
-			}
+		}
 		return sb;
 	}	//	createColumns
 
 	/**
 	 *	Create set/get methods for column
-	 * 	@param mandatory init call for mandatory columns
-	 * 	@param columnName column name
-	 * 	@param isUpdateable updateable
-	 * 	@param isMandatory mandatory
-	 * 	@param displayType display type
-	 * 	@param AD_Reference_ID validation reference
-	 * 	@param fieldLength int
-	 *	@param defaultValue default value
-	 * 	@param ValueMin String
-	 *	@param ValueMax String
-	 *	@param VFormat String
-	 *	@param Callout String
-	 *	@param Name String
-	 *	@param Description String
-	 * 	@param virtualColumn virtual column
-	 * 	@param IsEncrypted stored encrypted
-	@return set/get method
+	 * @param isView TODO
+	 * @param mandatory init call for mandatory columns
+	 * @param columnName column name
+	 * @param isUpdateable updateable
+	 * @param isMandatory mandatory
+	 * @param displayType display type
+	 * @param AD_Reference_ID validation reference
+	 * @param fieldLength int
+	 * @param defaultValue default value
+	 * @param ValueMin String
+	 * @param ValueMax String
+	 * @param VFormat String
+	 * @param Callout String
+	 * @param Name String
+	 * @param Description String
+	 * @param virtualColumn virtual column
+	 * @param IsEncrypted stored encrypted
+	 * @return set/get method
 	 */
-	private String createColumnMethods (StringBuilder mandatory, ColumnData cd, int AD_Table_ID)
+	private String createColumnMethods (int AD_Table_ID, boolean isView, ColumnData cd, StringBuilder mandatory)
 	{
 		Class<?> clazz = ModelInterfaceGen.getClass(cd.columnName, cd.displayType, cd.AD_Reference_ID);
 		String dataType = ModelInterfaceGen.getDataTypeName(clazz, cd.displayType);
@@ -672,6 +714,7 @@ public class ModelGen
 			{
 				String typeName = referenceClassName.substring(referenceClassName.lastIndexOf(".") + 1);
 				sb.append(NL)
+				.append(getOverrideAnnotation())
 				.append("\tpublic ").append(typeName).append(" get").append(fieldName).append("() throws RuntimeException {").append(NL)
 				.append("\t\treturn (").append(typeName).append(")MTable.get(getCtx(), ").append(typeName).append(".Table_Name)").append(NL)
 				.append("\t\t\t\t.getPO(get").append(cd.columnName).append("(), get_TrxName());").append(NL)
@@ -688,80 +731,83 @@ public class ModelGen
 		generateJavaSetComment(cd.columnName, cd.Name, cd.Description, sb);
 
 		//	public void setColumn (xxx variable)
-		String parameterName = getTrunk(cd.columnName, true);
-		sb.append("\tpublic void set").append(cd.columnName).append(" (").append(dataType).append(" ").append(parameterName).append(") {").append(NL)
-		;
-				
-		//	List Validation
-		if (cd.AD_Reference_ID != 0 && String.class == clazz)
-		{
-			String staticVar = addListValidation (sb, cd.AD_Reference_ID, cd.columnName, parameterName);
-			sb.insert(0, staticVar);
-		}
-		
-		//	Payment Validation
-		if (cd.displayType == DisplayType.Payment)
-		{
-			String staticVar = addListValidation (sb, REFERENCE_PAYMENTRULE, cd.columnName, parameterName);
-			sb.insert(0, staticVar);			
-		}
-
-		//	setValue ("ColumnName", xx);
-		if (cd.virtualColumn)
-		{
-			sb.append ("\t\tthrow new IllegalArgumentException (\"").append(cd.columnName).append(" is virtual column\");");
-		}
-		//	Integer
-		else if (clazz.equals(Integer.class))
-		{
-			if (cd.columnName.endsWith("_ID"))
+		if(!isView) {
+			String parameterName = getTrunk(cd.columnName, true);
+			sb.append(getOverrideAnnotation())
+			.append("\tpublic void set").append(cd.columnName).append(" (").append(dataType).append(" ").append(parameterName).append(") {").append(NL)
+			;
+					
+			//	List Validation
+			if (cd.AD_Reference_ID != 0 && String.class == clazz)
 			{
-				int firstOK = 1;
-				//	check special column
-				if (cd.columnName.equals("AD_Client_ID") || cd.columnName.equals("AD_Org_ID")
-					|| cd.columnName.equals("Record_ID") || cd.columnName.equals("C_DocType_ID")
-					|| cd.columnName.equals("Node_ID") || cd.columnName.equals("AD_Role_ID")
-					|| cd.columnName.equals("M_AttributeSet_ID") || cd.columnName.equals("M_AttributeSetInstance_ID"))
-					firstOK = 0;
-				//	set _ID to null if < 0 for special column or < 1 for others
-				sb.append("\t\tif (").append (parameterName).append (" < ").append(firstOK).append(") ").append(NL)
-					.append("\t").append(setValue).append(" (").append ("COLUMNNAME_").append(cd.columnName).append(", null);").append(NL)
-					.append("\t\telse ").append(NL).append("\t");
+				String staticVar = addListValidation (sb, cd.AD_Reference_ID, cd.columnName, parameterName);
+				sb.insert(0, staticVar);
 			}
-			sb.append(setValue).append(" (").append ("COLUMNNAME_").append(cd.columnName).append(", Integer.valueOf(").append(parameterName).append("));").append(NL);
-		}
-		//		Boolean
-		else if (clazz.equals(Boolean.class))
-			sb.append(setValue).append(" (").append ("COLUMNNAME_").append(cd.columnName).append(", Boolean.valueOf(").append(parameterName).append("));").append(NL);
-		else
-		{
-			sb.append(setValue).append(" (").append ("COLUMNNAME_").append (cd.columnName).append (", ")
-				.append(parameterName).append (");").append(NL);
-		}
-		sb.append("\t}").append(NL);
-
-		//	Mandatory call in constructor
-		if (cd.isMandatory)
-		{
-			mandatory.append("\t\t\tset").append(cd.columnName).append(" (");
-			if (clazz.equals(Integer.class))
-				mandatory.append("0");
+			
+			//	Payment Validation
+			if (cd.displayType == DisplayType.Payment)
+			{
+				String staticVar = addListValidation (sb, REFERENCE_PAYMENTRULE, cd.columnName, parameterName);
+				sb.insert(0, staticVar);			
+			}
+	
+			//	setValue ("ColumnName", xx);
+			if (cd.virtualColumn)
+			{
+				sb.append ("\t\tthrow new IllegalArgumentException (\"").append(cd.columnName).append(" is virtual column\");");
+			}
+			//	Integer
+			else if (clazz.equals(Integer.class))
+			{
+				if (cd.columnName.endsWith("_ID"))
+				{
+					int firstOK = 1;
+					//	check special column
+					if (cd.columnName.equals("AD_Client_ID") || cd.columnName.equals("AD_Org_ID")
+						|| cd.columnName.equals("Record_ID") || cd.columnName.equals("C_DocType_ID")
+						|| cd.columnName.equals("Node_ID") || cd.columnName.equals("AD_Role_ID")
+						|| cd.columnName.equals("M_AttributeSet_ID") || cd.columnName.equals("M_AttributeSetInstance_ID"))
+						firstOK = 0;
+					//	set _ID to null if < 0 for special column or < 1 for others
+					sb.append("\t\tif (").append (parameterName).append (" < ").append(firstOK).append(") ").append(NL)
+						.append("\t").append(setValue).append(" (").append ("COLUMNNAME_").append(cd.columnName).append(", null);").append(NL)
+						.append("\t\telse ").append(NL).append("\t");
+				}
+				sb.append(setValue).append(" (").append ("COLUMNNAME_").append(cd.columnName).append(", Integer.valueOf(").append(parameterName).append("));").append(NL);
+			}
+			//		Boolean
 			else if (clazz.equals(Boolean.class))
-			{
-				if (cd.defaultValue.indexOf('Y') != -1)
-					mandatory.append(true);
-				else
-					mandatory.append("false");
-			}
-			else if (clazz.equals(BigDecimal.class))
-				mandatory.append("Env.ZERO");
-			else if (clazz.equals(Timestamp.class))
-				mandatory.append("new Timestamp( System.currentTimeMillis() )");
+				sb.append(setValue).append(" (").append ("COLUMNNAME_").append(cd.columnName).append(", Boolean.valueOf(").append(parameterName).append("));").append(NL);
 			else
-				mandatory.append("null");
-			mandatory.append(");").append(NL);
-			if (cd.defaultValue.length() > 0)
-				mandatory.append("// ").append(cd.defaultValue).append(NL);
+			{
+				sb.append(setValue).append(" (").append ("COLUMNNAME_").append (cd.columnName).append (", ")
+					.append(parameterName).append (");").append(NL);
+			}
+			sb.append("\t}").append(NL);
+	
+			//	Mandatory call in constructor
+			if (cd.isMandatory)
+			{
+				mandatory.append("\t\t\tset").append(cd.columnName).append(" (");
+				if (clazz.equals(Integer.class))
+					mandatory.append("0");
+				else if (clazz.equals(Boolean.class))
+				{
+					if (cd.defaultValue.indexOf('Y') != -1)
+						mandatory.append(true);
+					else
+						mandatory.append("false");
+				}
+				else if (clazz.equals(BigDecimal.class))
+					mandatory.append("Env.ZERO");
+				else if (clazz.equals(Timestamp.class))
+					mandatory.append("new Timestamp( System.currentTimeMillis() )");
+				else
+					mandatory.append("null");
+				mandatory.append(");").append(NL);
+				if (cd.defaultValue.length() > 0)
+					mandatory.append("// ").append(cd.defaultValue).append(NL);
+			}
 		}
 
 
@@ -773,7 +819,8 @@ public class ModelGen
 		if (cd.IsEncrypted)
 			getValue = "get_ValueE";
 
-		sb.append("\tpublic ").append(dataType);
+		sb.append(getOverrideAnnotation())
+		.append("\tpublic ").append(dataType);
 		if (clazz.equals(Boolean.class))
 		{
 			sb.append(" is");
@@ -1011,15 +1058,19 @@ public class ModelGen
 	 * 
 	 * @param mmGen
 	 * @param isBaseClass
+	 * @param useCache TODO
 	 */
-	public static void generateSource(MModelGenerator mmGen, boolean isBaseClass)
+	public static void generateSource(MModelGenerator mmGen, boolean isBaseClass, boolean useCache)
 	{
+		//
+		// Validate mmGen
+		//
 		if (mmGen.getFolder() == null || mmGen.getFolder().trim().length() == 0)
 			throw new IllegalArgumentException("Must specify source folder");
 
 		File file = new File(mmGen.getFolder());
 		if (!file.exists())
-			throw new IllegalArgumentException("Source folder doesn't exists. sourceFolder="+mmGen.getFolder());
+			throw new IllegalArgumentException("Source folder does not exist. sourceFolder="+mmGen.getFolder());
 
 		if (mmGen.getPackageName() == null || mmGen.getPackageName().trim().length() == 0)
 			throw new IllegalArgumentException("Must specify package name");
@@ -1027,9 +1078,14 @@ public class ModelGen
 		if (mmGen.getTableName() == null || mmGen.getTableName().trim().length() == 0)
 			throw new IllegalArgumentException("Must specify table name");
 		
-		StringBuilder tableLike = new StringBuilder().append(mmGen.getTableName().trim());
-		if (!tableLike.toString().startsWith("'") || !tableLike.toString().endsWith("'"))
-			tableLike = new StringBuilder("'").append(tableLike).append("'");
+		//
+		// Build SQL query
+		//
+		String tableName = mmGen.getTableName().trim();
+		StringBuilder tableLike = (!tableName.startsWith("'") || !tableName.endsWith("'")) 
+				? new StringBuilder("'").append(tableName).append("'")
+				: new StringBuilder(tableName);
+			
 
 		StringBuilder tableEntityTypeFilter = new StringBuilder();
 		if (mmGen.getTableEntityTypeFilter() != null && mmGen.getTableEntityTypeFilter().trim().length() > 0) {
@@ -1064,6 +1120,7 @@ public class ModelGen
 			file.mkdirs();
 
 		//	complete sql
+		// TODO: make filtering of views optional.
 		String filterViews = null;
 		if (tableLike.toString().contains("%")) {
 			filterViews = "AND (TableName IN ('RV_WarehousePrice','RV_BPartner') OR IsView='N')"; 	//	special views
@@ -1071,10 +1128,10 @@ public class ModelGen
 		if (tableLike.toString().equals("'%'")) {
 			filterViews += " AND TableName NOT LIKE 'W|_%' ESCAPE '|'"; 	//	exclude webstore from general model generator
 		}
-		StringBuilder sql = new StringBuilder();
-		sql.append("SELECT AD_Table_ID ")
-			.append("FROM AD_Table ")
-			.append("WHERE IsActive = 'Y' AND TableName NOT LIKE '%_Trl' ");
+		StringBuilder sql = new StringBuilder("SELECT AD_Table_ID, "
+				+ "(IsView = 'Y') is true " 
+				+ "FROM AD_Table "
+				+ "WHERE IsActive = 'Y' AND TableName NOT LIKE '%_Trl' ");
 		// Autodetect if we need to use IN or LIKE clause - teo_sarca [ 3020640 ]
 		if (tableLike.indexOf(",") == -1)
 			sql.append(" AND TableName LIKE ").append(tableLike);
@@ -1111,9 +1168,15 @@ public class ModelGen
 		try {
 			pstmt = DB.prepareStatement(sql.toString(), null);
 			rs = pstmt.executeQuery();
-			while (rs.next())
-			{
-				new ModelGen(rs.getInt(1), directory.toString(), mmGen.getPackageName(), columnFilter, mmGen, isBaseClass);
+			while (rs.next()) {
+				new ModelGen(rs.getInt(1), // M_Table_ID
+						rs.getBoolean(2),  // isView 
+						directory.toString(), 
+						mmGen.getPackageName(), 
+						columnFilter, 
+						mmGen, 
+						isBaseClass, 
+						useCache);
 			}
 		}
 		catch (SQLException e) {
@@ -1123,6 +1186,8 @@ public class ModelGen
 			DB.close(rs, pstmt);
 			rs = null; pstmt = null;
 		}
+		mmGen.setIsDirty(false);
+		mmGen.saveEx();
 	}
 	
 	void showMsgBox(String msg) {
@@ -1174,6 +1239,12 @@ public class ModelGen
 		public boolean IsEncrypted;
 		public boolean IsKey;
 		public boolean IsIdentifier;
+	}
+	
+	private String getOverrideAnnotation() {
+		return m_mmGen.isExtension() || !m_isBaseClass
+				? "\t@Override" + NL 
+				: "";
 	}
 	
 }

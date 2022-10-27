@@ -85,6 +85,8 @@ public class ModelInterfaceGen
 
 	private String packageName = "";
 
+	private boolean isView;
+
 	public static final String NL = "\n";
 
 	/** File Header			*/
@@ -147,7 +149,7 @@ public class ModelInterfaceGen
 	private String createHeader(int AD_Table_ID, StringBuilder sb, StringBuilder mandatory) {
 		String tableName = "";
 		int accessLevel = 0;
-		String sql = "SELECT TableName, AccessLevel FROM AD_Table WHERE AD_Table_ID=?";
+		String sql = "SELECT TableName, (IsView = 'Y') is true, AccessLevel FROM AD_Table WHERE AD_Table_ID=?";
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		try {
@@ -157,7 +159,8 @@ public class ModelInterfaceGen
 			if (rs.next())
 			{
 				tableName = rs.getString(1);
-				accessLevel = rs.getInt(2);
+				isView = rs.getBoolean(2);
+				accessLevel = rs.getInt(3);
 			}
 		}
 		catch (SQLException e)
@@ -351,7 +354,7 @@ public class ModelInterfaceGen
 
 		StringBuilder sb = new StringBuilder();
 
-		if (isGenerateSetter(columnName))
+		if (!isView && !isGenerateSetter(columnName))
 		{
 			// Create Java Comment
 			generateJavaComment("Set", Name, Description, sb);
@@ -577,9 +580,8 @@ public class ModelInterfaceGen
 	 * @param columnName
 	 * @return true if a setter method should be generated
 	 */
-	public static boolean isGenerateSetter(String columnName)
-	{
-		return
+	public static boolean isGenerateSetter(String columnName) {
+		return 
 			!"AD_Client_ID".equals(columnName)
 			//&& !"AD_Org_ID".equals(columnName)
 			//&& !"IsActive".equals(columnName)
@@ -594,8 +596,7 @@ public class ModelInterfaceGen
 	 * @param columnName
 	 * @return true if a model getter method (method that is returning referenced PO) should be generated
 	 */
-	public static boolean isGenerateModelGetter(String columnName)
-	{
+	public static boolean isGenerateModelGetter(String columnName) {
 		return
 			!"AD_Client_ID".equals(columnName)
 			&& !"AD_Org_ID".equals(columnName)

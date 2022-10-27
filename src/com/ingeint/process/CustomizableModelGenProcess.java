@@ -6,7 +6,7 @@ public class CustomizableModelGenProcess extends ModelGenProcessBase {
 
 	@Override
 	void generate() {
-		ModelGen.generateSource(m_mgen, false);	
+		ModelGen.generateSource(m_mgen, false, true);	
 	}
 }
 

@@ -88,10 +88,10 @@ public class ModelGenMenuProcess extends ModelGenProcess {
 		if (createBase) {
 			if (!m_mgen.isExtension())
 				ModelInterfaceGen.generateSource(m_mgen);
-			ModelGen.generateSource(m_mgen, true);	
+			ModelGen.generateSource(m_mgen, true, true);	
 		}
 		if (createCustom) {
-			ModelGen.generateSource(m_mgen, false);	
+			ModelGen.generateSource(m_mgen, false, true);	
 		}
 	}
 	
