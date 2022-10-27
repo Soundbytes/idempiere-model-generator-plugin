@@ -6,9 +6,11 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 import org.adempiere.exceptions.DBException;
+import org.compiere.model.MColumn;
 import org.compiere.model.MEntityType;
 import org.compiere.model.MSysConfig;
 import org.compiere.model.MTable;
+import org.compiere.model.Query;
 import org.compiere.util.CLogger;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
@@ -123,6 +125,14 @@ public class MModelGenerator extends X_ING_ModelGenerator {
 			return new MTable(getCtx(), getING_Table_ID(), get_TrxName()).getTableName();
 		}
 		return super.getTableName();
+	}
+
+	public static MModelGenerator getFromTableID(int tableID) {
+		return new Query(Env.getCtx(), MModelGenerator.Table_Name, "ing_table_id=?", null).setParameters(tableID).first();
+	}
+
+	public static MModelGenerator get(MColumn column) {
+		return getFromTableID(column.getAD_Table_ID());
 	}
 
 }

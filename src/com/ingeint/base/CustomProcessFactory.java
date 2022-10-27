@@ -74,7 +74,7 @@ public abstract class CustomProcessFactory implements IProcessFactory {
 				try {
 					CustomProcess customProcess = cacheProcess.get(i).getDeclaredConstructor().newInstance();
 					log.info(String.format("ProcessFactory [Class Name: %s]", className));
-					return customProcess;
+					return (ProcessCall) customProcess;
 				} catch (Exception e) {
 					log.severe(String.format("ProcessFactory [Class %s can not be instantiated, Exception: %s]", className, e));
 					return null;

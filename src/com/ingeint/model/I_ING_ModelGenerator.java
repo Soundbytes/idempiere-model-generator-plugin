@@ -214,6 +214,19 @@ public interface I_ING_ModelGenerator
 	  */
 	public boolean isActive();
 
+    /** Column name IsDirty */
+    public static final String COLUMNNAME_IsDirty = "IsDirty";
+
+	/** Set Regenerate.
+	  * Source code needs to be regenerated
+	  */
+	public void setIsDirty (boolean isDirty);
+
+	/** Get Regenerate.
+	  * Source code needs to be regenerated
+	  */
+	public boolean isDirty();
+
     /** Column name IsExtension */
     public static final String COLUMNNAME_IsExtension = "IsExtension";
 

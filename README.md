@@ -101,7 +101,7 @@ e.G. a shared interface for MYMovement, MYInOut and MYInventory that extracts th
 - The downcast constructor can only inherit the state of the PO specific Data structures. Any data fields that are special to the parent class are initialized when the cast is executed. The current state of those fields in the parent object might be different from the newly downcast object's state. 
 - CAUTION! Model extensions can only be used within your own project. Make sure that your Model factory never ever injects any of your extended classes into the main application. 
 
-## Model Generator Window.
+## Model Generator Window
 
 Any model generator settings are persisted before the model classes/interfaces are created.  
 Existing generator settings can be managed through the Model Generator window.

@@ -82,6 +82,9 @@ public class FModelGenerator  extends CustomFormController{
 	protected Label createCustomLabel;
 	protected Checkbox createCustomCB;
 
+	protected Label requireCustomColumnLabel;
+	protected Checkbox requireCustomColumnCB;
+
 	private int tableID;
 
 	@Override
@@ -125,7 +128,10 @@ public class FModelGenerator  extends CustomFormController{
 		createBaseCB = new Checkbox();
 		
 		createCustomLabel = new Label("Create Custom Class");
-		createCustomCB = new Checkbox();		
+		createCustomCB = new Checkbox();	
+		
+		requireCustomColumnLabel = new Label("require Custom Columns");
+		requireCustomColumnCB = new Checkbox();	
 		
 		((CustomForm)getForm()).setWindowMode(false);
 		getForm().setTitle("Model Generator");
@@ -223,6 +229,9 @@ public class FModelGenerator  extends CustomFormController{
 		row = rows.newRow();
 		row.appendChild(createCustomLabel.rightAlign());
 		row.appendChild(createCustomCB);
+		row = rows.newRow();
+		row.appendChild(requireCustomColumnLabel.rightAlign());
+		row.appendChild(requireCustomColumnCB);
 	}	
 	
 	private void fillForm() {
@@ -236,6 +245,7 @@ public class FModelGenerator  extends CustomFormController{
 		baseClassEditor.setValue(gen.getBaseClassPackage());
 		createBaseCB.setChecked(true);
 		createCustomCB.setChecked(false);
+		requireCustomColumnCB.setChecked(gen.isHasCustomColumns());
 		
 		prefixEditor.setReadWrite(isExtensionCB.isChecked());
 		prefixEditor.setMandatory(isExtensionCB.isChecked());
@@ -265,6 +275,7 @@ public class FModelGenerator  extends CustomFormController{
 				getForm().dispose();
 			}
 			catch (Exception ex) {
+				ex.printStackTrace();
 				FDialog.error(getForm().getWindowNo(), getForm(), "Error", ex.getLocalizedMessage());
 			}
 		}
@@ -287,10 +298,10 @@ public class FModelGenerator  extends CustomFormController{
 		if (createBaseCB.isChecked()) {
 			if (!gen.isExtension())
 				ModelInterfaceGen.generateSource(gen);
-			ModelGen.generateSource(gen, true);	
+			ModelGen.generateSource(gen, true, true);	
 		}
 		if (createCustomCB.isChecked()) {
-			ModelGen.generateSource(gen, false);	
+			ModelGen.generateSource(gen, false, true);	
 		}		
 	}
 
@@ -306,6 +317,7 @@ public class FModelGenerator  extends CustomFormController{
 		gen.setIsExtension(isExtensionCB.isChecked());
 		gen.setCustomPrefix((String) prefixEditor.getValue());
 		gen.setBaseClassPackage((String) baseClassEditor.getValue());
+		gen.setHasCustomColumns(requireCustomColumnCB.isChecked());
 		gen.saveEx();
 	}
 

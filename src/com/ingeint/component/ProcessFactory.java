@@ -24,12 +24,37 @@
 
 package com.ingeint.component;
 
+import org.compiere.process.ProcessCall;
+
 import com.ingeint.base.CustomProcessFactory;
+import com.ingeint.process.IngDatabaseTableColumnRename;
+import com.ingeint.process.IngColumnSync;
+import com.ingeint.process.IngDatabaseElementColumnRename;
 
 /**
  * Process Factory
  */
 public class ProcessFactory extends CustomProcessFactory {
+	
+	@Override
+	public ProcessCall newProcessInstance(String className) {
+		ProcessCall pc = super.newProcessInstance(className);
+		if(pc != null)
+			return pc;
+		
+		switch (className) {
+		case "com.ingeint.process.IngColumnSync":
+			return new IngColumnSync();	
+		case "com.ingeint.process.IngDatabaseElementColumnRename":
+			return new IngDatabaseElementColumnRename();	
+		case "com.ingeint.process.IngDatabaseTableColumnRename":
+			return new IngDatabaseTableColumnRename();	
+		default:
+			return null;
+		}
+	}
+	
+	
 
 	/**
 	 * For initialize class. Register the process to build
