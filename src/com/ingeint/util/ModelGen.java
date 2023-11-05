@@ -92,7 +92,6 @@ public class ModelGen
 	protected String packageName = "";
 
 	private boolean m_isBaseClass;
-	private boolean m_useCache;
 	
 	/**
 	 * Generate PO Class
@@ -116,7 +115,6 @@ public class ModelGen
 		// add Base Class to Imports
 		m_mmGen = mmGen;
 		m_isBaseClass = isBaseClass;
-		m_useCache = !isBaseClass && useCache;
 		this.packageName = packageName;
 		
 		//	create column access methods
@@ -316,28 +314,28 @@ public class ModelGen
 		//
 
 		//
-		StringBuilder keyColumn = new StringBuilder().append(tableName).append("_ID");
-		StringBuilder className;
-		StringBuilder baseClassShortName;
+		String keyColumn = new StringBuilder(tableName).append("_ID").toString();
+		String className;
+		String baseClassShortName;
+		
+		String keyParameter = getTrunk(keyColumn, true);
 		
 		if (m_isBaseClass) {
-			className = new StringBuilder(prefixBase).append(tableName);
+			className = new StringBuilder(prefixBase).append(tableName).toString();
 			if (m_mmGen.isExtension()) {
-				baseClassShortName =  new StringBuilder("M").append(getTrunk(tableName));
+				baseClassShortName =  new StringBuilder("M").append(getTrunk(tableName)).toString();
 				addImportClass(baseClassPackage + "." + baseClassShortName);
 				ConstructorInfo ci = ConstructorInfo.get(baseClassPackage + "." + baseClassShortName);
 				log.warning(ci.toString());
 				ci.getParameters();
 				ci.getImports();
 			} else {
-				baseClassShortName =  new StringBuilder("PO");
+				baseClassShortName =  "PO";
 				addImportClass("org.compiere.model.PO");
 			}
 		} else {
-			className = new StringBuilder(prefixDerived).append(getTrunk(tableName));
-			baseClassShortName = new StringBuilder(m_mmGen.isExtension() ? prefixBase : "X_").append(tableName);
-			if(m_useCache)
-				addImportClass("group.ecofuels.utils.POCache");
+			className = new StringBuilder(prefixDerived).append(getTrunk(tableName)).toString();
+			baseClassShortName = new StringBuilder(m_mmGen.isExtension() ? prefixBase : "X_").append(tableName).toString();
 		}
 			
 		//
@@ -394,17 +392,14 @@ public class ModelGen
 			 .append("\t/**").append(NL)
 			 .append("\t * Standard Constructor").append(NL)
 			 .append("\t */").append(NL)
-			 .append("\tpublic ").append(className).append(" (Properties ctx, int ").append(keyColumn).append(", String trxName) {").append(NL)
-			 .append("\t\tsuper (ctx, ").append(keyColumn).append(", trxName);").append(NL);
+			 .append("\tpublic ").append(className).append(" (Properties ctx, int ").append(keyParameter).append(", String trxName) {").append(NL)
+			 .append("\t\tsuper (ctx, ").append(keyParameter).append(", trxName);").append(NL);
 		if (mandatory.length() > 0) {	 
-			startBottom.append("\t\t/** if (").append(keyColumn).append(" == 0)").append(NL)
+			startBottom.append("\t\t/** if (").append(keyParameter).append(" == 0)").append(NL)
 				.append("\t\t{").append(NL)
 				.append(mandatory) //.append(NL)
 				.append("\t\t} */").append(NL);
 		}
-		if (m_useCache)
-			startBottom.append("\t\tif(").append(keyColumn).append(" > 1)").append(NL)
-				.append("\t\t\tPOCache.put(this);").append(NL);
 		startBottom.append("\t}").append(NL)
 			//	Constructor End
 
@@ -415,8 +410,6 @@ public class ModelGen
 			 .append("\t */").append(NL)
 			 .append("\tpublic ").append(className).append(" (Properties ctx, ResultSet rs, String trxName) {").append(NL)
 			 .append("\t\tsuper (ctx, rs, trxName);").append(NL);
-		if (m_useCache)
-			startBottom.append("\t\tPOCache.put(this);").append(NL);
 		startBottom.append("\t}").append(NL);
 		
 			//	Load Constructor End
@@ -486,21 +479,10 @@ public class ModelGen
 				.append("\t\treturn sb.toString();").append(NL)
 				.append("\t}").append(NL);
 		}
-		else if(m_useCache) {
-			startBottom.append(NL)
-			.append(getOverrideAnnotation())
-			.append("\tpublic boolean save() {").append(NL)
-			.append("\t\tPOCache.put(this);").append(NL)
-			.append("\t\treturn super.save();").append(NL)
-			.append("\t}").append(NL)
-			.append(NL)
-			.append("\tpublic static ").append(className).append(" get(Properties ctx, int ").append(keyColumn).append(", String trxName) {").append(NL)
-			.append("\t\t").append(className).append(" retVal = POCache.get(\"").append(className).append("\", ").append(keyColumn).append(", trxName);").append(NL)
-			.append("\t\tif (retVal == null)").append(NL)
-			.append("\t\t\tretVal = new ").append(className).append(" (ctx, ").append(keyColumn).append(", trxName);").append(NL)
-			.append("\t\treturn retVal;").append(NL)
-			.append("\t}").append(NL);
-		}
+		startBottom.append(NL)
+		.append("\tpublic static ").append(className).append(" get(Properties ctx, int ").append(keyParameter).append(", String trxName) {").append(NL)
+		.append("\t\t\treturn new ").append(className).append(" (ctx, ").append(keyParameter).append(", trxName);").append(NL)
+		.append("\t}").append(NL);
 		
 		//
 		// TODO: For views: Throw an Exception when saving or deleting 
@@ -531,8 +513,6 @@ public class ModelGen
 					.append("\t\tpublic Closer (X_").append(tableName).append(" base) {").append(NL)
 					.append("\t\t\tsuper (base.getCtx(), 0, base.get_TrxName());").append(NL)
 					.append("\t\t\tshallowCopy(base, this);").append(NL);
-			if(m_useCache) 
-				end.append("\t\t\tPOCache.put(this);").append(NL);
 			end.append("\t\t}").append(NL)
 					.append("\t}").append(NL);
 		}
@@ -1242,7 +1222,7 @@ public class ModelGen
 	}
 	
 	private String getOverrideAnnotation() {
-		return m_mmGen.isExtension() || !m_isBaseClass
+		return !m_mmGen.isExtension() || !m_isBaseClass
 				? "\t@Override" + NL 
 				: "";
 	}

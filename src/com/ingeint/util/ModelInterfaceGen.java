@@ -354,7 +354,7 @@ public class ModelInterfaceGen
 
 		StringBuilder sb = new StringBuilder();
 
-		if (!isView && !isGenerateSetter(columnName))
+		if (!isView && isGenerateSetter(columnName))
 		{
 			// Create Java Comment
 			generateJavaComment("Set", Name, Description, sb);
@@ -800,7 +800,7 @@ public class ModelInterfaceGen
 
 		File file = new File(sourceFolder);
 		if (!file.exists())
-			throw new IllegalArgumentException("Source folder doesn't exists. sourceFolder="+sourceFolder);
+			throw new IllegalArgumentException("Source folder doesn't exists. sourceFolder = "+sourceFolder);
 
 		if (packageName == null || packageName.trim().length() == 0)
 			throw new IllegalArgumentException("Must specify package name");

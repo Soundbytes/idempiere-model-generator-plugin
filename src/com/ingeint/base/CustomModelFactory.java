@@ -80,19 +80,21 @@ public abstract class CustomModelFactory implements IModelFactory {
 		return clazz;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public PO getPO(String tableName, int Record_ID, String trxName) {
+	public <P extends PO> P getPO(String tableName, int Record_ID, String trxName) {
 
 		Class<?> clazz = getClass(tableName);
 		if (clazz == null)
 			return null;
 
-		PO model = null;
+		P model = null;
 		Constructor<?> constructor = null;
 
 		try {
 			constructor = clazz.getDeclaredConstructor(new Class[] { Properties.class, int.class, String.class });
-			model = (PO) constructor.newInstance(new Object[] { Env.getCtx(), Integer.valueOf(Record_ID), trxName });
+			PO po = (PO) constructor.newInstance(new Object[] { Env.getCtx(), Integer.valueOf(Record_ID), trxName });
+			model = (P)po;
 			log.info(String.format("ModelFactory [Table Name: %s, Model: %s]", tableName, clazz.getName()));
 		} catch (Exception e) {
 			log.severe(String.format("ModelFactory [Class %s can not be instantiated for table: %s, Exception: %s]", clazz.getName(), tableName, e));
@@ -101,19 +103,21 @@ public abstract class CustomModelFactory implements IModelFactory {
 		return model;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public PO getPO(String tableName, ResultSet rs, String trxName) {
+	public <P extends PO> P getPO(String tableName, ResultSet rs, String trxName) {
 
 		Class<?> clazz = getClass(tableName);
 		if (clazz == null)
 			return null;
 
-		PO model = null;
+		P model = null;
 		Constructor<?> constructor = null;
 
 		try {
 			constructor = clazz.getDeclaredConstructor(new Class[] { Properties.class, ResultSet.class, String.class });
-			model = (PO) constructor.newInstance(new Object[] { Env.getCtx(), rs, trxName });
+			PO po = (PO) constructor.newInstance(new Object[] { Env.getCtx(), rs, trxName });
+			model = (P)po;
 			log.info(String.format("ModelFactory [Table Name: %s, Model: %s]", tableName, clazz.getName()));
 		} catch (Exception e) {
 			log.severe(String.format("ModelFactory [Class %s can not be instantiated for table: %s, Exception: %s]", clazz.getName(), tableName, e));

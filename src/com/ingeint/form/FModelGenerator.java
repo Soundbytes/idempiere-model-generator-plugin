@@ -37,48 +37,48 @@ import com.ingeint.model.MModelGenerator;
 import com.ingeint.util.ModelGen;
 import com.ingeint.util.ModelInterfaceGen;
 
-public class FModelGenerator  extends CustomFormController{
-	
-	final CLogger log =  CLogger.getCLogger(getClass());
-	
-	MModelGenerator gen;	
+public class FModelGenerator extends CustomFormController {
+
+	final CLogger log = CLogger.getCLogger(getClass());
+
+	MModelGenerator gen;
 
 	private Borderlayout contentPane;
 	private ConfirmPanel confirmPanel;
-	
+
 	public Grid northPanel;
 	public Grid parameterPanel;
 
 	private North north;
 	public Center center;
-	
+
 	protected Label folderLabel;
 	protected WStringEditor folderEditor;
-	
+
 	protected Label tableIDLabel;
 	protected WTableDirEditor tableIDEditor;
-	
+
 	protected Label colEntityTypeLabel;
 	protected WChosenboxListEditor colEntityTypeEditor;
-	
+
 	protected Label tableEntityTypeLabel;
 	protected WChosenboxListEditor tableEntityTypeEditor;
-	
+
 	protected Label packageLabel;
 	protected WStringEditor packageEditor;
 
 	protected Label isExtensionLabel;
 	protected Checkbox isExtensionCB;
-	
+
 	protected Label prefixLabel;
 	protected WStringEditor prefixEditor;
-	
+
 	protected Label baseClassLabel;
 	protected WStringEditor baseClassEditor;
 
 	protected Label createBaseLabel;
 	protected Checkbox createBaseCB;
-	
+
 	protected Label createCustomLabel;
 	protected Checkbox createCustomCB;
 
@@ -91,55 +91,54 @@ public class FModelGenerator  extends CustomFormController{
 	public void buildForm() throws Exception {
 		contentPane = new Borderlayout();
 		confirmPanel = new ConfirmPanel(true, true, false, false, false, false, false);
-		
+
 		northPanel = GridFactory.newGridLayout();
 		parameterPanel = GridFactory.newGridLayout();
 
 		north = new North();
 		center = new Center();
-		
+
 		folderLabel = new Label("Source Folder");
 		folderEditor = new WStringEditor();
 		folderEditor.getComponent().setWidth("100%");
-		
+
 		tableIDLabel = new Label(Msg.getElement(Env.getCtx(), "AD_Table_ID", false));
-		
+
 		colEntityTypeLabel = new Label(Msg.getElement(Env.getCtx(), "ColumnEntityTypeFilter", false));
-		
+
 		tableEntityTypeLabel = new Label(Msg.getElement(Env.getCtx(), "TableEntityTypeFilter", false));
-		
+
 		packageLabel = new Label(Msg.getElement(Env.getCtx(), "PackageName", false));
 		packageEditor = new WStringEditor();
 		packageEditor.getComponent().setWidth("100%");
-	
+
 		isExtensionLabel = new Label(Msg.getElement(Env.getCtx(), "IsExtension", false));
 		isExtensionCB = new Checkbox();
 		isExtensionCB.addActionListener(this);
-		
+
 		prefixLabel = new Label(Msg.getElement(Env.getCtx(), "CustomPrefix", false));
 		prefixEditor = new WStringEditor();
 		prefixEditor.getComponent().setWidth("100%");
-		
+
 		baseClassLabel = new Label(Msg.getElement(Env.getCtx(), "BaseClassPackage", false));
 		baseClassEditor = new WStringEditor();
 		baseClassEditor.getComponent().setWidth("100%");
-	
+
 		createBaseLabel = new Label("Create Model Base Class");
 		createBaseCB = new Checkbox();
-		
+
 		createCustomLabel = new Label("Create Custom Class");
-		createCustomCB = new Checkbox();	
-		
+		createCustomCB = new Checkbox();
+
 		requireCustomColumnLabel = new Label("require Custom Columns");
-		requireCustomColumnCB = new Checkbox();	
-		
-		((CustomForm)getForm()).setWindowMode(false);
+		requireCustomColumnCB = new Checkbox();
+
+		((CustomForm) getForm()).setWindowMode(false);
 		getForm().setTitle("Model Generator");
-		
+
 		try {
 			getForm().appendChild(contentPane);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace(System.out);
 			throw e;
 		}
@@ -149,55 +148,49 @@ public class FModelGenerator  extends CustomFormController{
 		north.setCollapsible(true);
 		north.setSplittable(true);
 		LayoutUtils.addSlideSclass(north);
-		
+
 		center.appendChild(parameterPanel);
 		contentPane.appendChild(center);
-		
+
 		Columns columns = new Columns();
 		parameterPanel.appendChild(columns);
 		Column column = new Column();
-		columns.appendChild(column);		
+		columns.appendChild(column);
 		column = new Column();
 		column.setWidth("250px");
 		columns.appendChild(column);
 		column.setWidth("650px");
-		
-		
+
 		South south = new South();
 		contentPane.appendChild(south);
 		south.appendChild(confirmPanel);
-		
+
 		confirmPanel.addActionListener(this);
-		
-		
-		
+
 		int height = 450;
 		int width = 900;
 		ZKUpdateUtil.setWidth(getForm(), width + "px");
 		ZKUpdateUtil.setHeight(getForm(), height + "px");
 
-
 //		int windowNo = getForm().getGridTab().getWindowNo();
 
 		MLookup lu = null;
 
-		lu = MLookupFactory.get (Env.getCtx(), 0, 0, 
-				MColumn.getColumn_ID(MModelGenerator.Table_Name, MModelGenerator.COLUMNNAME_ColumnEntityTypeFilter), 
+		lu = MLookupFactory.get(Env.getCtx(), 0, 0,
+				MColumn.getColumn_ID(MModelGenerator.Table_Name, MModelGenerator.COLUMNNAME_ColumnEntityTypeFilter),
 				DisplayType.ChosenMultipleSelectionTable);
 		colEntityTypeEditor = new WChosenboxListEditor(lu, "", "", true, false, true);
-		
-		lu = MLookupFactory.get (Env.getCtx(), 0, 0, 
-				MColumn.getColumn_ID(MModelGenerator.Table_Name, MModelGenerator.COLUMNNAME_TableEntityTypeFilter), 
+
+		lu = MLookupFactory.get(Env.getCtx(), 0, 0,
+				MColumn.getColumn_ID(MModelGenerator.Table_Name, MModelGenerator.COLUMNNAME_TableEntityTypeFilter),
 				DisplayType.ChosenMultipleSelectionTable);
 		tableEntityTypeEditor = new WChosenboxListEditor(lu, "", "", true, false, true);
 
-		lu = MLookupFactory.get (Env.getCtx(), 0, 0, 
-				MColumn.getColumn_ID(MTable.Table_Name, MTable.COLUMNNAME_AD_Table_ID), 
-				DisplayType.TableDir);
+		lu = MLookupFactory.get(Env.getCtx(), 0, 0,
+				MColumn.getColumn_ID(MTable.Table_Name, MTable.COLUMNNAME_AD_Table_ID), DisplayType.TableDir);
 		tableIDEditor = new WTableDirEditor(lu, "", "", true, true, true);
 		tableIDEditor.getComponent().setWidth("100%");
-		
-		
+
 		Rows rows = (Rows) parameterPanel.newRows();
 		Row row = rows.newRow();
 		row.appendChild(folderLabel.rightAlign());
@@ -232,8 +225,8 @@ public class FModelGenerator  extends CustomFormController{
 		row = rows.newRow();
 		row.appendChild(requireCustomColumnLabel.rightAlign());
 		row.appendChild(requireCustomColumnCB);
-	}	
-	
+	}
+
 	private void fillForm() {
 		folderEditor.setValue(gen.getFolder());
 		tableIDEditor.setValue(gen.getING_Table_ID());
@@ -246,49 +239,45 @@ public class FModelGenerator  extends CustomFormController{
 		createBaseCB.setChecked(true);
 		createCustomCB.setChecked(false);
 		requireCustomColumnCB.setChecked(gen.isHasCustomColumns());
-		
+
 		prefixEditor.setReadWrite(isExtensionCB.isChecked());
 		prefixEditor.setMandatory(isExtensionCB.isChecked());
 		baseClassEditor.setReadWrite(isExtensionCB.isChecked());
 		baseClassEditor.setMandatory(isExtensionCB.isChecked());
 	}
-	
+
 	@Override
 	protected void initForm() {
 		tableID = getForm().getGridTab().getRecord_ID();
 		gen = MModelGenerator.get(tableID, false, null);
 		fillForm();
 	}
-	
 
-	public void onEvent(Event e) throws Exception
-	{
-		//  OK - Save
+	public void onEvent(Event e) throws Exception {
+		// OK - Save
 		if (e.getTarget().getId().equals(ConfirmPanel.A_OK)) {
 			try {
 				Trx.run(new TrxRunnable() {
-					public void run(String trxName)	{
+					public void run(String trxName) {
 						persist(trxName);
 						generate(trxName);
 					}
 				});
 				getForm().dispose();
-			}
-			catch (Exception ex) {
+			} catch (Exception ex) {
 				ex.printStackTrace();
 				FDialog.error(getForm().getWindowNo(), getForm(), "Error", ex.getLocalizedMessage());
 			}
 		}
-		//  Cancel
+		// Cancel
 		else if (e.getTarget().getId().equals(ConfirmPanel.A_CANCEL)) {
 			getForm().dispose();
 		}
-		//  Refresh
+		// Refresh
 		else if (e.getTarget().getId().equals(ConfirmPanel.A_REFRESH)) {
 			gen = MModelGenerator.get(tableID, true, null);
 			fillForm();
-		}
-		else if (e.getTarget().equals(isExtensionCB)) {
+		} else if (e.getTarget().equals(isExtensionCB)) {
 			prefixEditor.setReadWrite(isExtensionCB.isChecked());
 			baseClassEditor.setReadWrite(isExtensionCB.isChecked());
 		}
@@ -298,14 +287,12 @@ public class FModelGenerator  extends CustomFormController{
 		if (createBaseCB.isChecked()) {
 			if (!gen.isExtension())
 				ModelInterfaceGen.generateSource(gen);
-			ModelGen.generateSource(gen, true, true);	
+			ModelGen.generateSource(gen, true, true);
 		}
 		if (createCustomCB.isChecked()) {
-			ModelGen.generateSource(gen, false, true);	
-		}		
+			ModelGen.generateSource(gen, false, true);
+		}
 	}
-
-
 
 	private void persist(String trxName) {
 		gen.setFolder((String) folderEditor.getValue());
